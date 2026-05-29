@@ -92,7 +92,7 @@ class TuningSessionCreate(BaseModel):
     objective: str = "composite"
     params: dict[str, Any] = Field(default_factory=dict)
     backtest_config: TuningBacktestConfig
-    max_iterations: int = Field(default=5, ge=1, le=12)
+    max_iterations: int = Field(default=5, ge=1, le=500)
 
 
 class TuningTrialOut(BaseModel):

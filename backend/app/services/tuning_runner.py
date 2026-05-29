@@ -187,6 +187,55 @@ def verify_advise(
     }
 
 
+def _prior_analysis_from_history(trials_history: list[dict[str, Any]]) -> str:
+    parts: list[str] = []
+    for t in trials_history:
+        verdict = t.get("verdict") or ""
+        analysis = t.get("verify_analysis") or ""
+        if verdict or analysis:
+            parts.append(f"--- 第 {t.get('iteration')} 轮 [{verdict}] ---\n{analysis}")
+    return "\n\n".join(parts)
+
+
+def _prepare_next_iteration(
+    *,
+    strategy_name: str,
+    params: dict[str, Any],
+    trade_params: dict[str, Any],
+    cfg: dict[str, Any],
+    verify_result: dict[str, Any],
+    goal: str,
+    trials_history: list[dict[str, Any]],
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """优先采用 verify 微调建议；若无则 fallback 到 advise。"""
+    next_params = params
+    next_trade = trade_params
+    next_cfg = cfg
+    has_verify_tweak = bool(verify_result.get("suggested_params") or verify_result.get("suggested_trade_params"))
+
+    if verify_result.get("suggested_params"):
+        next_params = verify_result["suggested_params"]
+    if verify_result.get("suggested_trade_params"):
+        next_trade = verify_result["suggested_trade_params"]
+        next_cfg = merge_trade_into_backtest_config(cfg, next_trade)
+    if has_verify_tweak:
+        return next_params, next_trade, next_cfg
+
+    if not is_llm_configured():
+        raise LlmNotConfiguredError("未配置大模型")
+    advise_result = advise(
+        strategy_name=strategy_name,
+        params=params,
+        goal=goal,
+        summary=trials_history[-1].get("summary") if trials_history else None,
+        backtest_config=cfg,
+    )
+    next_params = advise_result["suggested_params"]
+    next_trade = advise_result["suggested_trade_params"]
+    next_cfg = merge_trade_into_backtest_config(cfg, next_trade)
+    return next_params, next_trade, next_cfg
+
+
 def _run_session(session_id: str) -> None:
     try:
         with session_scope() as s:
@@ -205,44 +254,34 @@ def _run_session(session_id: str) -> None:
         trials_history: list[dict[str, Any]] = []
         best_score = float("-inf")
         best_trial_id: str | None = None
+        prior_analysis = ""
+        baseline_summary = cfg.get("baseline_summary") if isinstance(cfg.get("baseline_summary"), dict) else None
 
         for i in range(max_iter):
             summary: dict[str, Any] | None = None
             score: float | None = None
-            analysis = ""
             t0 = time.perf_counter()
 
             try:
-                if i == 0:
-                    trial_params = params
-                else:
-                    if not is_llm_configured():
-                        raise LlmNotConfiguredError("未配置大模型")
-                    system, user = build_advise_prompt(
-                        strategy_name=strategy_name,
-                        current_params=params,
-                        trade_params=trade_params,
-                        summary=trials_history[-1].get("summary") if trials_history else None,
-                        goal=goal,
-                        trials=trials_history,
-                    )
-                    raw = chat_json(system=system, user=user)
-                    analysis = str(raw.get("analysis") or "")
-                    suggested = raw.get("suggested_params") or params
-                    merged = {**params, **suggested} if isinstance(suggested, dict) else params
-                    trial_params = validate_strategy_params(strategy_name, merged)
-                    suggested_trade = raw.get("suggested_trade_params")
-                    if isinstance(suggested_trade, dict) and suggested_trade:
-                        trade_params = validate_trade_params(suggested_trade, base=trade_params)
-                        cfg = merge_trade_into_backtest_config(cfg, trade_params)
+                if not is_llm_configured():
+                    raise LlmNotConfiguredError("未配置大模型")
 
                 summary, score = evaluate_params(
                     strategy_name=strategy_name,
-                    params=trial_params,
+                    params=params,
                     backtest_config=cfg,
                     objective=objective,
                 )
-                params = trial_params
+
+                verify_result = verify_advise(
+                    strategy_name=strategy_name,
+                    suggested_params=params,
+                    trade_params=trade_params,
+                    verify_summary=summary,
+                    goal=goal,
+                    baseline_summary=baseline_summary if i == 0 else None,
+                    prior_analysis=prior_analysis,
+                )
             except Exception as e:
                 with session_scope() as s:
                     sess = s.get(TuningSession, session_id)
@@ -251,6 +290,13 @@ def _run_session(session_id: str) -> None:
                         sess.error = str(e)
                         sess.finished_at = datetime.utcnow()
                 return
+
+            verdict = str(verify_result.get("verdict") or "未知")
+            meets_goal = bool(verify_result.get("meets_goal"))
+            analysis_text = verify_result.get("analysis") or ""
+            if verify_result.get("comparison"):
+                analysis_text = f"{analysis_text}\n对比：{verify_result['comparison']}"
+            llm_analysis = f"[{verdict}] {analysis_text}".strip()
 
             elapsed = round(time.perf_counter() - t0, 2)
             trial_id = str(uuid.uuid4())
@@ -262,11 +308,13 @@ def _run_session(session_id: str) -> None:
                     params=params,
                     summary=summary,
                     score=score,
-                    llm_analysis=analysis or None,
+                    llm_analysis=llm_analysis,
                     elapsed_seconds=elapsed,
                 )
                 s.add(trial)
-                if score is not None and score > best_score:
+                if meets_goal:
+                    best_trial_id = trial_id
+                elif score is not None and score > best_score:
                     best_score = score
                     best_trial_id = trial_id
                 sess = s.get(TuningSession, session_id)
@@ -280,8 +328,28 @@ def _run_session(session_id: str) -> None:
                     "trade_params": trade_params,
                     "summary": summary,
                     "score": score,
+                    "verdict": verdict,
+                    "meets_goal": meets_goal,
+                    "verify_analysis": verify_result.get("analysis") or "",
                 }
             )
+
+            if meets_goal:
+                break
+
+            if i >= max_iter - 1:
+                break
+
+            params, trade_params, cfg = _prepare_next_iteration(
+                strategy_name=strategy_name,
+                params=params,
+                trade_params=trade_params,
+                cfg=cfg,
+                verify_result=verify_result,
+                goal=goal,
+                trials_history=trials_history,
+            )
+            prior_analysis = _prior_analysis_from_history(trials_history)
 
         with session_scope() as s:
             sess = s.get(TuningSession, session_id)

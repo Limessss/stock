@@ -783,10 +783,17 @@ export default function TuningPage() {
         </Card>
       )}
 
-      <Card title="自动循环调参">
+      <Card
+        title="自动循环调参"
+        extra={
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            每轮：回测 → AI 检验 → 按检验建议优化；达成目标提前结束，否则最多 {maxIterations} 轮
+          </Text>
+        }
+      >
         <Space wrap style={{ marginBottom: 16 }}>
           <span>最大轮次</span>
-          <InputNumber min={1} max={12} value={maxIterations} onChange={(v) => setMaxIterations(v ?? 5)} />
+          <InputNumber min={1} max={500} value={maxIterations} onChange={(v) => setMaxIterations(v ?? 5)} />
           <Button
             loading={sessionMut.isPending}
             disabled={!llmReady}
@@ -817,6 +824,20 @@ export default function TuningPage() {
               columns={[
                 { title: "轮次", dataIndex: "iteration", width: 60 },
                 {
+                  title: "检验",
+                  width: 88,
+                  render: (_, r) => {
+                    const m = r.llm_analysis?.match(/^\[(.+?)\]/);
+                    const verdict = m?.[1] ?? "—";
+                    const ok = verdict === "达成" || r.llm_analysis?.includes("达成");
+                    return (
+                      <Tag color={ok ? "success" : verdict === "部分达成" ? "warning" : "default"}>
+                        {verdict}
+                      </Tag>
+                    );
+                  },
+                },
+                {
                   title: "得分",
                   dataIndex: "score",
                   render: (v: number | null) => (v != null ? v.toFixed(2) : "—"),
@@ -838,6 +859,14 @@ export default function TuningPage() {
                 {
                   title: "成交",
                   render: (_, r) => r.summary?.total_trades ?? "—",
+                },
+                {
+                  title: "AI 检验摘要",
+                  ellipsis: true,
+                  render: (_, r) => {
+                    const text = r.llm_analysis?.replace(/^\[[^\]]+\]\s*/, "") ?? "—";
+                    return text.length > 48 ? `${text.slice(0, 48)}…` : text;
+                  },
                 },
                 {
                   title: "耗时s",
