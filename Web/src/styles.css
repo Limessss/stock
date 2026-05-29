@@ -1,0 +1,28 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Microsoft YaHei", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html[data-theme="light"] body {
+  background: #f5f7fa;
+}
+
+html[data-theme="dark"] body {
+  background: #141414;
+  color: #e6e6e6;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.page-container {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
