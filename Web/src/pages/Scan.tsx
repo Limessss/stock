@@ -4,11 +4,8 @@ import {
   App,
   Button,
   Card,
-  Col,
-  DatePicker,
   Empty,
   InputNumber,
-  Row,
   Select,
   Space,
   Statistic,
@@ -16,15 +13,15 @@ import {
   Table,
   Tag,
   Typography,
-} from "antd";
-import type { ColumnsType } from "antd/es/table";
-import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+} from "@/components/ui";
+import type { ColumnsType } from "@/components/ui";
+import { ReloadOutlined, SearchOutlined } from "@/components/ui/icons";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
-import { useNavigate } from "react-router-dom";
 
 import { fetchStrategies } from "@/api/strategies";
 import { runScan, type ScanRow } from "@/api/scan";
+import ChineseDatePicker from "@/components/ChineseDatePicker";
 import ParamForm from "@/components/ParamForm";
 import {
   loadScanPageCache,
@@ -43,7 +40,6 @@ const TIER_COLOR: Record<string, string> = {
 };
 
 export default function ScanPage() {
-  const navigate = useNavigate();
   const { message } = App.useApp();
   const queryClient = useQueryClient();
 
@@ -131,11 +127,7 @@ export default function ScanPage() {
       dataIndex: "code",
       width: 105,
       fixed: "left",
-      render: (v: string) => (
-        <a onClick={() => navigate(`/diagnose?code=${v}&date=${scanResult?.target_date ?? ""}&strategy=${strategyName}`)}>
-          {v}
-        </a>
-      ),
+      render: (v: string) => <Text code>{v}</Text>,
     },
     {
       title: "名称",
@@ -242,14 +234,17 @@ export default function ScanPage() {
 
   return (
     <>
-      <Title level={3} style={{ marginTop: 0 }}>
-        选股扫描
-      </Title>
+      <div className="page-heading">
+        <div>
+          <Title level={2}>选股扫描</Title>
+          <Typography.Paragraph type="secondary">选择策略与交易日，使用本地行情缓存筛选候选股票</Typography.Paragraph>
+        </div>
+      </div>
 
-      <Card style={{ marginBottom: 16 }}>
-        <Row gutter={[16, 16]} align="middle" style={{ marginBottom: 16 }}>
-          <Col>
-            <Text>策略：</Text>
+      <Card className="workbench-form-card" style={{ marginBottom: 16 }}>
+        <div className="workbench-form-grid">
+          <div className="workbench-field span-3">
+            <label>扫描策略</label>
             <Select
               value={strategyName}
               onChange={(v) => {
@@ -257,52 +252,46 @@ export default function ScanPage() {
                 setParams({});
               }}
               options={(strategies ?? []).map((s) => ({ label: s.label, value: s.name }))}
-              style={{ width: 200, marginLeft: 8 }}
+              style={{ width: "100%" }}
             />
-          </Col>
-          <Col>
-            <Text>交易日：</Text>
-            <DatePicker
+          </div>
+          <div className="workbench-field span-3">
+            <label>交易日</label>
+            <ChineseDatePicker
               value={targetDate}
               onChange={setTargetDate}
               placeholder="留空=最后一日"
-              format="YYYY-MM-DD"
-              style={{ marginLeft: 8 }}
+              style={{ width: "100%" }}
             />
-          </Col>
-          <Col>
-            <Text>取前 N：</Text>
+          </div>
+          <div className="workbench-field span-2">
+            <label>返回数量</label>
             <InputNumber
               value={limit}
               onChange={(v) => setLimit(v ?? 200)}
               min={1}
               max={5000}
-              style={{ width: 100, marginLeft: 8 }}
+              style={{ width: "100%" }}
             />
-          </Col>
-          <Col>
-            <Switch
-              checked={debugMode}
-              onChange={setDebugMode}
-              checkedChildren="调试"
-              unCheckedChildren="全市场"
-            />
-          </Col>
+          </div>
+          <div className="workbench-field span-2">
+            <label>扫描范围</label>
+            <div className="workbench-switch-field"><Switch checked={debugMode} onChange={setDebugMode} checkedChildren="调试" unCheckedChildren="全市场" /></div>
+          </div>
           {debugMode && (
-            <Col>
-              <Text>只扫前 N 只：</Text>
+            <div className="workbench-field span-2">
+              <label>调试样本数</label>
               <InputNumber
                 value={maxCodes ?? undefined}
                 onChange={(v) => setMaxCodes(v ?? null)}
                 min={1}
                 max={5000}
                 placeholder="如 100"
-                style={{ width: 120, marginLeft: 8 }}
+                style={{ width: "100%" }}
               />
-            </Col>
+            </div>
           )}
-          <Col flex="auto" style={{ textAlign: "right" }}>
-            <Space>
+          <div className="workbench-form-actions">
               <Button
                 type="primary"
                 icon={<SearchOutlined />}
@@ -320,16 +309,14 @@ export default function ScanPage() {
               >
                 重置参数
               </Button>
-            </Space>
-          </Col>
-        </Row>
+          </div>
+        </div>
 
         {currentStrategy && (
-          <ParamForm
-            schema={currentStrategy.params_schema}
-            value={params}
-            onChange={setParams}
-          />
+          <div className="workbench-form-section">
+            <div className="workbench-form-section-head"><strong>策略参数</strong><span>{currentStrategy.label}</span></div>
+            <ParamForm schema={currentStrategy.params_schema} value={params} onChange={setParams} />
+          </div>
         )}
       </Card>
 
@@ -365,7 +352,7 @@ export default function ScanPage() {
           />
         </Card>
       ) : (
-        <Empty description="点击「开始扫描」运行" />
+        <div className="form-result-empty"><Empty description="配置条件后，点击「开始扫描」查看结果" /></div>
       )}
     </>
   );

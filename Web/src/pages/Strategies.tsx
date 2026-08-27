@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, Empty, Space, Spin, Table, Tag, Typography } from "antd";
-import { AppstoreOutlined, RightOutlined, StarFilled } from "@ant-design/icons";
+import { Card, Empty, Space, Spin, Table, Tag, Typography } from "@/components/ui";
+import { AppstoreOutlined, RightOutlined, StarFilled } from "@/components/ui/icons";
 import { Link } from "react-router-dom";
-import type { ColumnsType } from "antd/es/table";
+import type { ColumnsType } from "@/components/ui";
 
 import { fetchStrategies, type StrategyInfo } from "@/api/strategies";
 
@@ -121,4 +121,4 @@ export default function StrategiesPage() {
     </Space>
   );
 }
-
+

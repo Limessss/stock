@@ -15,6 +15,8 @@ import time
 import uuid
 from dataclasses import asdict
 from datetime import datetime
+
+from ..core.time_utils import utc_now
 from queue import Empty
 from typing import Any
 
@@ -189,7 +191,7 @@ def execute_backtest_task(
         if task is None:
             return
         task.status = TaskStatus.running.value
-        task.started_at = datetime.utcnow()
+        task.started_at = utc_now()
         s.flush()
         task_extras = extras if extras is not None else _task_extras.pop(task_id, {})
         cfg = BacktestConfig(
@@ -245,7 +247,7 @@ def execute_backtest_task(
             t.summary = asdict(summary)
             t.trade_count = len(trades_df)
             t.status = TaskStatus.done.value
-            t.finished_at = datetime.utcnow()
+            t.finished_at = utc_now()
             t.elapsed_seconds = round(time.time() - t0, 2)
 
         done_payload = {
@@ -266,7 +268,7 @@ def execute_backtest_task(
             if t is not None:
                 t.status = TaskStatus.error.value
                 t.error = f"{type(e).__name__}: {e}"
-                t.finished_at = datetime.utcnow()
+                t.finished_at = utc_now()
                 t.elapsed_seconds = round(time.time() - t0, 2)
         err_payload = {
             "type": "error",

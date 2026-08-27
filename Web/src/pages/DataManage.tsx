@@ -15,24 +15,51 @@ import {
   Table,
   Tag,
   Typography,
-} from "antd";
+} from "@/components/ui";
 import {
+  CloudDownloadOutlined,
   DatabaseOutlined,
   SearchOutlined,
   ThunderboltOutlined,
   ReloadOutlined,
-} from "@ant-design/icons";
+} from "@/components/ui/icons";
 
 import { fetchHealth } from "@/api/health";
-import { getBuildStatus, getCacheStats, startBuild } from "@/api/data";
-import { getKline } from "@/api/diagnose";
+import {
+  getBuildStatus,
+  getCacheStats,
+  getTdxSyncStatus,
+  startBuild,
+  startTdxSync,
+} from "@/api/data";
+import { formatBeijingTime } from "@/lib/dayjsSetup";
+import { getKline } from "@/api/kline";
 
 const { Title, Paragraph, Text } = Typography;
+
+const TDX_STAGE_LABEL: Record<string, string> = {
+  idle: "等待更新",
+  checking: "检查官方版本",
+  downloading: "下载官方日线包",
+  extracting: "解压日线文件",
+  "downloading-gbbq": "下载 GBBQ 除权资料",
+  "parsing-gbbq": "解析 GBBQ 并生成复权事件缓存",
+  "using-local-data": "远端未变化，使用本地数据",
+  "building-cache": "构建前复权 Parquet",
+  done: "更新完成",
+  error: "更新失败",
+};
+
+function formatProgressValue(value: number, unit: string): string {
+  if (unit !== "bytes") return value.toLocaleString();
+  return `${(value / 1024 / 1024).toFixed(1)} MB`;
+}
 
 export default function DataManagePage() {
   const qc = useQueryClient();
   const { modal, message } = App.useApp();
   const [buildPolling, setBuildPolling] = useState(false);
+  const [tdxPolling, setTdxPolling] = useState(false);
   const [code, setCode] = useState("sz000001");
   const [queriedCode, setQueriedCode] = useState<string | null>(null);
 
@@ -47,6 +74,11 @@ export default function DataManagePage() {
     queryFn: getBuildStatus,
     enabled: buildPolling,
     refetchInterval: buildPolling ? 1_000 : false,
+  });
+  const tdxStatusQ = useQuery({
+    queryKey: ["tdx-sync-status"],
+    queryFn: getTdxSyncStatus,
+    refetchInterval: tdxPolling ? 1_000 : false,
   });
 
   if (buildStatusQ.data && !buildStatusQ.data.running && buildPolling) {
@@ -64,6 +96,26 @@ export default function DataManagePage() {
     onSuccess: () => {
       setBuildPolling(true);
       message.info("构建任务已启动");
+    },
+    onError: (e: Error) => message.error("启动失败：" + e.message),
+  });
+
+  if (tdxStatusQ.data && !tdxStatusQ.data.running && tdxPolling) {
+    setTdxPolling(false);
+    qc.invalidateQueries({ queryKey: ["cache-stats"] });
+    qc.invalidateQueries({ queryKey: ["health"] });
+    if (tdxStatusQ.data.error) message.error("通达信更新失败：" + tdxStatusQ.data.error);
+    else message.success(
+      `行情更新完成：解压 ${tdxStatusQ.data.extracted} 个文件，GBBQ ${tdxStatusQ.data.gbbq_events.toLocaleString()} 条，Parquet 更新 ${tdxStatusQ.data.updated} 只`
+    );
+  }
+
+  const tdxMutation = useMutation({
+    mutationFn: (forceDownload: boolean) => startTdxSync(forceDownload),
+    onSuccess: (result) => {
+      setTdxPolling(true);
+      qc.setQueryData(["tdx-sync-status"], result);
+      message.info("已开始后台下载与增量构建");
     },
     onError: (e: Error) => message.error("启动失败：" + e.message),
   });
@@ -93,8 +145,18 @@ export default function DataManagePage() {
       onOk: () => buildMutation.mutate(false),
     });
 
+  const onTdxSync = () =>
+    modal.confirm({
+      title: "同步通达信日线、GBBQ 并更新缓存？",
+      content: "将分别检查官方日线包与 GBBQ 除权资料的版本。只有远端发生变化时才下载，并在本地计算、缓存前复权行情。",
+      okText: "开始更新",
+      cancelText: "取消",
+      onOk: () => tdxMutation.mutate(false),
+    });
+
   const stats = statsQ.data;
   const bs = buildStatusQ.data;
+  const tdx = tdxStatusQ.data;
   const kline = klineQ.data;
 
   return (
@@ -134,10 +196,60 @@ export default function DataManagePage() {
         </Col>
         <Col span={6}>
           <Card>
-            <Statistic title="缓存最近更新" value={stats?.last_updated || "—"} />
+            <Statistic
+              title="缓存最近更新"
+              value={formatBeijingTime(stats?.last_updated, "YYYY-MM-DD HH:mm:ss")}
+            />
           </Card>
         </Col>
       </Row>
+
+      <Card
+        style={{ marginTop: 16 }}
+        title={<Space><CloudDownloadOutlined /><span>通达信官方数据更新</span></Space>}
+        extra={
+          <Button
+            type="primary"
+            icon={<CloudDownloadOutlined />}
+            disabled={tdx?.running || bs?.running || tdxMutation.isPending}
+            loading={tdxMutation.isPending}
+            onClick={onTdxSync}
+          >
+            {tdx?.running ? "更新中…" : "下载最新数据并构建"}
+          </Button>
+        }
+      >
+        <Alert
+          type="info"
+          showIcon
+          message="通达信日线 + GBBQ · 本地计算前复权 · 版本未变化不重复下载"
+          description="状态轮询只读取本机；每次显式同步仅检查一次官方版本，日线或除权资料发生变化时才下载，原始行情会完整保留。"
+          style={{ marginBottom: 16 }}
+        />
+        <Descriptions column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2, xxl: 2 }} bordered size="small">
+          <Descriptions.Item label="当前阶段">{TDX_STAGE_LABEL[tdx?.stage ?? "idle"] ?? tdx?.stage}</Descriptions.Item>
+          <Descriptions.Item label="本地最新交易日">{tdx?.last_raw_date || "—"}</Descriptions.Item>
+          <Descriptions.Item label="官方更新时间">{tdx?.remote_time || "首次更新时检查"}</Descriptions.Item>
+          <Descriptions.Item label="官方包大小">{tdx?.remote_size || "约 500MB"}</Descriptions.Item>
+          <Descriptions.Item label="下载文件">{tdx?.download_path || "—"}</Descriptions.Item>
+          <Descriptions.Item label="官方来源">
+            {tdx?.source_url ? <a href={tdx.source_url} target="_blank" rel="noreferrer">data.tdx.com.cn</a> : "通达信官方"}
+          </Descriptions.Item>
+          <Descriptions.Item label="GBBQ 事件缓存">{(tdx?.gbbq_events ?? 0).toLocaleString()} 条</Descriptions.Item>
+          <Descriptions.Item label="GBBQ 最近解析">{formatBeijingTime(tdx?.gbbq_updated_at, "YYYY-MM-DD HH:mm:ss") || "—"}</Descriptions.Item>
+        </Descriptions>
+        {tdx?.running && (
+          <div style={{ marginTop: 16 }}>
+            <Progress percent={tdx.progress_pct} status="active" />
+            <Paragraph type="secondary" style={{ marginTop: 4, fontSize: 12 }}>
+              {TDX_STAGE_LABEL[tdx.stage] ?? tdx.stage} · {formatProgressValue(tdx.done, tdx.unit)}
+              {tdx.total ? ` / ${formatProgressValue(tdx.total, tdx.unit)}` : ""}
+              {` · 用时 ${tdx.elapsed_seconds}s`}
+            </Paragraph>
+          </div>
+        )}
+        {tdx?.error && <Alert style={{ marginTop: 16 }} type="error" showIcon message="更新失败" description={tdx.error} />}
+      </Card>
 
       <Card
         style={{ marginTop: 16 }}

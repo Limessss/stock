@@ -1,4 +1,4 @@
-"""Phase 3 全链路端到端：vbt 引擎回测 + factor analysis。"""
+"""Phase 3 全链路端到端：legacy / vectorbt 回测与指标。"""
 from __future__ import annotations
 
 import os
@@ -52,17 +52,6 @@ def main() -> None:
     print("\n--- legacy /metrics ---")
     m = requests.get(f"{BASE}/backtest/{legacy_id}/metrics", timeout=10).json()
     print(f"  monthly={len(m['monthly'])} cells  equity={len(m['equity_curve'])} pts")
-
-    # 4. /factor/analysis
-    print("\n--- legacy /factor/analysis ---")
-    fa = requests.get(f"{BASE}/factor/analysis", params={"task_id": legacy_id}, timeout=20).json()
-    print(f"  total_trades={fa['total_trades']}  ic_rows={len(fa['ic'])}  "
-          f"quantile_factors={len(fa['quantiles'])}")
-    top = sorted(fa["ic"], key=lambda r: abs(r["ic_return"] or 0), reverse=True)[:3]
-    print("  top-3 by |IC|:")
-    for r in top:
-        print(f"    {r['label']:<14} ic_return={r['ic_return']:+.4f}")
-
 
 if __name__ == "__main__":
     main()

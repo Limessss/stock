@@ -1,10 +1,11 @@
 """回测 schemas。"""
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
+
+from ..core.time_utils import UtcDateTime
 
 
 class BacktestRequest(BaseModel):
@@ -90,9 +91,9 @@ class BacktestTaskOut(BaseModel):
     progress: int
     total: int
     error: str | None
-    created_at: datetime
-    started_at: datetime | None
-    finished_at: datetime | None
+    created_at: UtcDateTime
+    started_at: UtcDateTime | None
+    finished_at: UtcDateTime | None
     elapsed_seconds: float | None
     summary: dict | None
     trade_count: int

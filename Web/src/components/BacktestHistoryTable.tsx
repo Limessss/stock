@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
-import { Button, Input, Popconfirm, Select, Space, Table, Tag, Typography } from "antd";
-import type { ColumnsType } from "antd/es/table";
-import { DeleteOutlined, EyeOutlined, SearchOutlined } from "@ant-design/icons";
+import { Button, Input, Popconfirm, Select, Space, Table, Tag, Typography } from "@/components/ui";
+import type { ColumnsType } from "@/components/ui";
+import { DeleteOutlined, EyeOutlined, SearchOutlined } from "@/components/ui/icons";
 
 import type { BacktestTask } from "@/api/backtest";
 import type { StrategyInfo } from "@/api/scan";
+import { formatBeijingTime, parseApiTime } from "@/lib/dayjsSetup";
 
 const { Text } = Typography;
 
@@ -235,10 +236,11 @@ export default function BacktestHistoryTable({
       width: 160,
       render: (v: string) => (
         <Text type="secondary" style={{ fontSize: 12 }}>
-          {v ? new Date(v).toLocaleString() : "—"}
+          {formatBeijingTime(v, "YYYY-MM-DD HH:mm")}
         </Text>
       ),
-      sorter: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      sorter: (a, b) =>
+        parseApiTime(a.created_at).valueOf() - parseApiTime(b.created_at).valueOf(),
       defaultSortOrder: "descend",
     },
     {

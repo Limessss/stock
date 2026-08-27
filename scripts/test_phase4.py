@@ -3,7 +3,6 @@
 验证：
 - /api/backtest/{id}/trades.csv  CSV 导出（UTF-8 BOM、Excel 直开不乱码）
 - /api/backtest/{id}/metrics     扩展风险指标（夏普 / 最大回撤 / 月度 / 净值曲线）
-- /api/factor/analysis           多因子 IC + 分位
 
 依赖：后端运行在 http://localhost:8000，且至少存在 1 个 status=done 的任务。
 """
@@ -59,14 +58,6 @@ def main() -> int:
         f"cagr={m.get('cagr_pct'):.1f}% "
         f"monthly={len(m.get('monthly', []))} "
         f"equity={len(m.get('equity_curve', []))}"
-    )
-
-    # ---- factor analysis ----
-    url = f"{BASE}/api/factor/analysis?task_id={task_id}"
-    f = json.loads(urllib.request.urlopen(url, timeout=15).read())
-    print(
-        f"[OK ] factor: ic_rows={len(f.get('ic', []))} "
-        f"quantiles={len(f.get('quantiles', []))}"
     )
 
     print("\n[PASS] all Phase 4 endpoints functional")

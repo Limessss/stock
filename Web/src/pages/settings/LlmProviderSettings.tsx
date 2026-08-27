@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Alert, App, Button, Card, Form, Input, InputNumber, Space, Tag, Typography } from "antd";
-import { SaveOutlined, ThunderboltOutlined } from "@ant-design/icons";
+import { Alert, App, Button, Card, Form, Input, InputNumber, Space, Tag, Typography } from "@/components/ui";
+import { SaveOutlined, ThunderboltOutlined } from "@/components/ui/icons";
 
 import { getLlmSettings, testLlmSettings, updateLlmSettings } from "@/api/settings";
 
@@ -77,7 +77,7 @@ export default function LlmProviderSettings() {
           大模型提供商
         </Title>
         <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-          配置 OpenAI 兼容接口（OpenAI、DeepSeek、通义、本地 vLLM 等）。AI 调参等功能将使用此处配置。
+          配置 OpenAI 兼容接口（OpenAI、DeepSeek、通义、本地 vLLM 等）。
           Key 保存在本地 <Text code>data/cache/system_settings.json</Text>。
         </Paragraph>
         {settingsQ.data && (
@@ -141,7 +141,7 @@ export default function LlmProviderSettings() {
         <Alert
           type="info"
           showIcon
-          message="配置完成后即可使用「AI 调参」功能"
+          message="配置已保存，可通过连接测试验证服务可用性"
           description="请填写 API Key 并保存，然后点击测试连接确认可用。"
         />
       )}

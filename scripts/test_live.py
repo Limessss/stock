@@ -55,10 +55,6 @@ def main() -> None:
     for row in b["rows"]:
         print(f"     - {row['code']} {row['date']} score={row['score']} breakout%={row['breakout_pct']}")
 
-    print("==> GET /api/diagnose/SZ002281?date=2026-04-09")
-    s, b = get("/api/diagnose/SZ002281?date=2026-04-09")
-    print(f"   {s}  final_status={b['final_status']}  score={b['score']}  rules={len(b['rules'])}")
-
     print("==> GET /api/kline/SZ002281?last_n=60")
     s, b = get("/api/kline/SZ002281?last_n=60")
     print(f"   {s}  candles={len(b['candles'])}  ma60={len(b['ma60'])}")

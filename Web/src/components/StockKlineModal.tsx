@@ -2,11 +2,11 @@ import { useMemo } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 
-import { Alert, Modal, Space, Spin, Tag, Typography } from "antd";
+import { Alert, Modal, Space, Spin, Tag, Typography } from "@/components/ui";
 
 
 
-import { getKline } from "@/api/diagnose";
+import { getKline } from "@/api/kline";
 
 import KlineChart, { type KlineMarker } from "@/components/KlineChart";
 
@@ -170,21 +170,31 @@ export default function StockKlineModal({ open, stock, onClose }: Props) {
 
     queryKey: ["stock-kline", stock?.code, centerDate, minDate, maxDate],
 
-    queryFn: () =>
+    queryFn: () => {
 
-      getKline(stock!.code, {
+      if (!stock?.code) throw new Error("missing code");
 
-        lastN: KLINE_LAST_N,
+      if (centerDate) {
 
-        centerDate,
+        return getKline(stock.code, {
 
-        minDate,
+          lastN: KLINE_LAST_N,
 
-        maxDate,
+          centerDate,
 
-      }),
+          minDate,
 
-    enabled: open && !!stock?.code && !!centerDate,
+          maxDate,
+
+        });
+
+      }
+
+      return getKline(stock.code, { lastN: KLINE_LAST_N });
+
+    },
+
+    enabled: open && !!stock?.code,
 
     retry: false,
 
@@ -270,7 +280,7 @@ export default function StockKlineModal({ open, stock, onClose }: Props) {
 
       )}
 
-      {klineQ.data && centerDate && (
+      {klineQ.data && (
 
         <KlineChart
 

@@ -16,9 +16,8 @@ import {
   Statistic,
   Tag,
   Typography,
-} from "antd";
-import { DownloadOutlined, RobotOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+} from "@/components/ui";
+import { DownloadOutlined } from "@/components/ui/icons";
 
 import {
   getBacktest,
@@ -35,6 +34,7 @@ import MonthlyHeatmap from "@/components/MonthlyHeatmap";
 import TradeLedgerTable from "@/components/TradeLedgerTable";
 import TradesTable from "@/components/TradesTable";
 import StockKlineModal, { type StockKlineTarget } from "@/components/StockKlineModal";
+import { formatBeijingTime } from "@/lib/dayjsSetup";
 
 const { Text } = Typography;
 
@@ -393,18 +393,16 @@ export default function BacktestDetailModal({ open, taskId, strategies, onClose 
               <Descriptions.Item label="最大持仓">{task.max_concurrent} 只</Descriptions.Item>
               <Descriptions.Item label="T+1">{task.t_plus_1 ? "开" : "关"}</Descriptions.Item>
               <Descriptions.Item label="创建时间">
-                {task.created_at ? new Date(task.created_at).toLocaleString() : "—"}
+                {formatBeijingTime(task.created_at, "YYYY-MM-DD HH:mm:ss")}
+              </Descriptions.Item>
+              <Descriptions.Item label="开始时间">
+                {formatBeijingTime(task.started_at, "YYYY-MM-DD HH:mm:ss")}
+              </Descriptions.Item>
+              <Descriptions.Item label="结束时间">
+                {formatBeijingTime(task.finished_at, "YYYY-MM-DD HH:mm:ss")}
               </Descriptions.Item>
             </Descriptions>
           </Card>
-
-          {task.status === "done" && (
-            <Link to={`/tuning?task_id=${task.id}&strategy=${task.strategy_name}`}>
-              <Button type="primary" icon={<RobotOutlined />}>
-                发送到 AI 调参
-              </Button>
-            </Link>
-          )}
 
           <Collapse
             size="small"

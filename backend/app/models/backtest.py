@@ -17,6 +17,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..core.database import Base
+from ..core.time_utils import utc_now
 
 
 class TaskStatus(str, enum.Enum):
@@ -56,9 +57,9 @@ class BacktestTask(Base):
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # 时间
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    finished_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     elapsed_seconds: Mapped[float | None] = mapped_column(Float, nullable=True)
 
     # 汇总指标

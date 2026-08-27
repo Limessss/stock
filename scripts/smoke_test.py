@@ -12,7 +12,6 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from model.data.tdx_parser import parse_day_file  # noqa: E402
-from model.diagnose import diagnose_breakout  # noqa: E402
 from model.strategies import get_strategy  # noqa: E402
 
 RAW_DIR = Path(r"C:\Users\66470\Desktop\stockmodel\data\raw")
@@ -57,18 +56,6 @@ def main() -> int:
         print("全部通过")
     else:
         print(f"{failed} 例不符预期")
-
-    # 诊断接口测试
-    print()
-    print("--- 诊断接口测试 (sz002281 2026-04-09) ---")
-    path = RAW_DIR / "sz" / "lday" / "sz002281.day"
-    df = parse_day_file(path)
-    if df is not None:
-        report = diagnose_breakout("SZ002281", df, target_date=pd.Timestamp("2026-04-09"))
-        print(f"日期: {report.date}  收盘: {report.close}  最终: {report.final_status}  评分: {report.score}")
-        for r in report.rules:
-            v = r.value if r.value is not None else "-"
-            print(f"  [{r.status:4s}] {r.name:20s}  value={v}  threshold={r.threshold}")
 
     return failed
 

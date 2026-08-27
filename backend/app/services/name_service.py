@@ -30,3 +30,7 @@ def enrich_names(codes: list[str]) -> dict[str, str]:
 def total_names() -> int:
     _ensure_path()
     return name_store.total_names()
+
+
+def ensure_names_path() -> None:
+    _ensure_path()

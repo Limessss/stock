@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Col, Collapse, Row, Tooltip, Typography } from "antd";
+import { Col, Collapse, Row, Tooltip, Typography } from "@/components/ui";
 
 import type { StrategyParamSchema } from "@/api/scan";
 import { getParamDesc, getParamLabel, getTypeLabel } from "@/utils/paramLabels";

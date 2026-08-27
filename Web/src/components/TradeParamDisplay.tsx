@@ -1,4 +1,4 @@
-import { Descriptions } from "antd";
+import { Descriptions } from "@/components/ui";
 
 import {
   formatTradeParamValue,

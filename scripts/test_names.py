@@ -24,8 +24,5 @@ print(f"/api/scan: {r['total']} hits in {r['took_ms']}ms")
 for row in r["rows"][:5]:
     print(f"  {row['code']:>10}  {row['name']:<12}  score={row['score']:.2f}")
 
-d = get("/api/diagnose/SZ002281?date=2026-04-09")
-print(f"/api/diagnose: code={d['code']} name={d['name']!r} score={d['score']}")
-
 k = get("/api/kline/SZ002281?last_n=10")
 print(f"/api/kline: code={k['code']} name={k['name']!r} candles={len(k['candles'])}")

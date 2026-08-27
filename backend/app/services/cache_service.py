@@ -122,6 +122,10 @@ def _run_build(codes: list[str] | None) -> None:
         _build_status.updated = result.updated
         _build_status.skipped = result.skipped
         _build_status.failed = result.failed
+        # 行情更新后顺带重建近期收盘价矩阵，使区间涨幅查询无需再次扫描全市场。
+        from .interval_gain_service import build_close_matrix
+
+        build_close_matrix(settings.cache_dir, force=result.updated > 0)  # type: ignore[arg-type]
     except Exception as e:  # noqa: BLE001 后台任务需要捕获所有异常
         _build_status.error = f"{type(e).__name__}: {e}"
     finally:

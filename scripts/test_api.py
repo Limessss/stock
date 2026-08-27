@@ -47,10 +47,7 @@ resp = c.post("/api/scan", json={
 })
 show("scan", resp)
 
-print("5) GET /api/diagnose/SZ002281?date=2026-04-09")
-show("diagnose", c.get("/api/diagnose/SZ002281?date=2026-04-09"))
-
-print("6) GET /api/kline/SZ002281?last_n=60")
+print("5) GET /api/kline/SZ002281?last_n=60")
 resp = c.get("/api/kline/SZ002281?last_n=60")
 body = resp.json()
 print(f"  status={resp.status_code}  candles={len(body.get('candles', []))}  "

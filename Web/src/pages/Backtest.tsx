@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   Col,
-  Divider,
   Input,
   Progress,
   Row,
@@ -15,12 +14,12 @@ import {
   Statistic,
   Tag,
   Typography,
-} from "antd";
+} from "@/components/ui";
 import {
   PlayCircleOutlined,
   HistoryOutlined,
   EyeOutlined,
-} from "@ant-design/icons";
+} from "@/components/ui/icons";
 import dayjs, { type Dayjs } from "dayjs";
 
 import {
@@ -241,22 +240,25 @@ export default function BacktestPage() {
 
   return (
     <>
-      <Title level={3} style={{ marginTop: 0 }}>
-        回测
-      </Title>
+      <div className="page-heading">
+        <div>
+          <Title level={2}>回测中心</Title>
+          <Typography.Paragraph type="secondary">配置策略、资金与执行规则，验证历史区间表现</Typography.Paragraph>
+        </div>
+      </div>
 
-      <Card title="参数" style={{ marginBottom: 16 }}>
+      <Card title="回测配置" className="workbench-form-card" style={{ marginBottom: 16 }}>
         <Row gutter={[16, 12]}>
-          <Col span={6}>
-            <Text>任务名</Text>
+          <Col xs={24} md={8} className="workbench-field">
+            <label>任务名称</label>
             <Input
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="便于历史区分（可空）"
             />
           </Col>
-          <Col span={4}>
-            <Text>策略</Text>
+          <Col xs={24} md={6} className="workbench-field">
+            <label>回测策略</label>
             <Select
               value={form.strategyName}
               onChange={(v) => setForm({ ...form, strategyName: v, params: {} })}
@@ -272,16 +274,10 @@ export default function BacktestPage() {
           />
         </div>
 
-        <Divider style={{ margin: "16px 0" }} orientation="left" orientationMargin="0">
-          策略参数
-        </Divider>
-        {currentStrategy && (
-          <ParamForm
-            schema={currentStrategy.params_schema}
-            value={form.params}
-            onChange={(v) => setForm({ ...form, params: v })}
-          />
-        )}
+        {currentStrategy && <div className="workbench-form-section">
+          <div className="workbench-form-section-head"><strong>策略参数</strong><span>{currentStrategy.label}</span></div>
+          <ParamForm schema={currentStrategy.params_schema} value={form.params} onChange={(v) => setForm({ ...form, params: v })} />
+        </div>}
 
         <div style={{ marginTop: 16, textAlign: "right" }}>
           <Button

@@ -14,16 +14,16 @@
 from __future__ import annotations
 
 import json
-import time
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
 
 import pandas as pd
 
+from .adjustment import AdjustmentStore
 from .indicators import add_indicators
 from .tdx_parser import is_a_share_code, iter_day_files, parse_day_file, raw_last_date
-
+from .time_util import utc_now_iso
 
 MANIFEST_NAME = "manifest.json"
 META_SUFFIX = ".meta.json"
@@ -61,6 +61,7 @@ class DataCache:
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self._memory: dict[str, pd.DataFrame] = {}
+        self._adjustments = AdjustmentStore(self.cache_dir)
 
     # ------------------- 路径辅助 -------------------
 
@@ -91,6 +92,7 @@ class DataCache:
             "last_date": last,
             "raw_mtime": raw_path.stat().st_mtime,
             "rows": len(df),
+            "adjustment_version": self._adjustments.version_for(code),
         }
         self._meta_path(code).write_text(
             json.dumps(data, ensure_ascii=False), encoding="utf-8"
@@ -113,6 +115,8 @@ class DataCache:
             return True
         cached_last = _norm_date(str(meta.get("last_date", "")))
         if tail != cached_last:
+            return True
+        if str(meta.get("adjustment_version", "")) != self._adjustments.version_for(code):
             return True
         try:
             if float(meta.get("raw_mtime", 0)) != raw_path.stat().st_mtime:
@@ -186,7 +190,19 @@ class DataCache:
                     progress_cb(i, total)
                 continue
 
+            df = self._adjustments.apply_qfq(code, df)
             df = add_indicators(df)
+            qfq_frame = df[["date", "qfq_open", "qfq_high", "qfq_low", "qfq_close", "volume"]].rename(
+                columns={
+                    "qfq_open": "open",
+                    "qfq_high": "high",
+                    "qfq_low": "low",
+                    "qfq_close": "close",
+                }
+            )
+            qfq_indicators = add_indicators(qfq_frame)
+            for column in ("ma5", "ma10", "ma20", "ma30", "ma60", "dif", "dea", "macd"):
+                df[f"qfq_{column}"] = qfq_indicators[column]
             self.save(code, df)
             self._write_meta(code, raw_path=path, df=df)
             updated += 1
@@ -240,7 +256,7 @@ class DataCache:
             "version": PARQUET_VERSION,
             "file_count": file_count,
             "row_count": row_count,
-            "last_updated": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "last_updated": utc_now_iso(),
             "last_incremental": incremental,
         }
         self.manifest_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")

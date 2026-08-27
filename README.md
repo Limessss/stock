@@ -1,6 +1,6 @@
 # A 股回测平台
 
-本地化 A 股形态识别 + 回测可视化平台。读通达信 `.day` 历史数据，扫描洗盘突破等形态，多进程并行全市场回测，输出夏普 / Calmar / 月度收益热力图，配套多因子 IC 分析与参数对比页。
+本地化 A 股形态识别 + 回测可视化平台。读通达信 `.day` 历史数据，扫描洗盘突破等形态，多进程并行全市场回测，输出夏普 / Calmar / 月度收益热力图，并提供情绪周期分析。
 
 > 个人单机版，前后端分离。后端纯本地（FastAPI + SQLite）；前端 React 18 + Ant Design。
 
@@ -23,12 +23,6 @@ curosr/                          仓库根
 │   │   ├── parallel.py           ProcessPoolExecutor worker
 │   │   ├── simulate_legacy.py    手写单笔模拟（精确，sl/tp 用 high/low）
 │   │   └── vbt_engine.py         VectorBT 引擎（实验性，sl/tp 用 close）
-│   ├── factor_analysis/
-│   │   ├── ic.py                 Spearman 秩相关 IC
-│   │   ├── quantile.py           N 分位收益统计
-│   │   └── scoring.py            评分公式权重
-│   └── diagnose/
-│       └── check.py              逐规则 PASS/FAIL 诊断
 │
 ├── backend/                      FastAPI 服务层
 │   └── app/
@@ -36,18 +30,16 @@ curosr/                          仓库根
 │       ├── api/
 │       │   ├── health.py         /api/health
 │       │   ├── scan.py           /api/strategies, /api/scan
-│       │   ├── diagnose.py       /api/diagnose/{code}, /api/kline/{code}
+│       │   ├── kline.py          /api/kline/{code}
 │       │   ├── data.py           /api/data/stats, /api/data/build
 │       │   ├── backtest.py       /api/backtest（POST/GET/DELETE）+ /metrics + /trades.csv
 │       │   │                     + WebSocket /ws/backtest/{task_id}
-│       │   └── factor.py         /api/factor/analysis
 │       ├── core/                 配置 + SQLAlchemy 引擎
 │       ├── models/               ORM：BacktestTask / BacktestTrade
 │       ├── schemas/              Pydantic 模型
 │       └── services/
 │           ├── cache_service.py  缓存构建后台任务
 │           ├── backtest_service.py 回测任务编排（线程池 + 内存进度 + SQLite 落库）
-│           ├── factor_service.py
 │           ├── ws_manager.py     WebSocket 广播器
 │           └── name_service.py   股票名称缓存
 │
@@ -56,19 +48,15 @@ curosr/                          仓库根
 │       ├── pages/
 │       │   ├── Health.tsx        系统状态 / 数据概览
 │       │   ├── Scan.tsx          策略扫描（动态参数表单 + 结果表）
-│       │   ├── Diagnose.tsx      个股诊断（K 线图 + 13 规则 PASS/FAIL）
 │       │   ├── Backtest.tsx      回测主页（参数 + 进度 WS + 净值 + 月度热力图 + trades）
-│       │   ├── Factor.tsx        多因子分析（IC 表 + 因子×分位 热力图）
-│       │   ├── Compare.tsx       双任务并排对比（指标 / 净值叠加 / IC 对照）
+│       │   ├── Compare.tsx       双任务并排对比（指标 / 净值叠加）
 │       │   └── DataManage.tsx    缓存管理 + 单股查询
 │       ├── components/
 │       │   ├── KlineChart.tsx          TradingView Lightweight Charts
 │       │   ├── EquityCurve.tsx         单/多曲线净值图（ECharts）
 │       │   ├── MonthlyHeatmap.tsx
-│       │   ├── FactorQuantileHeatmap.tsx
 │       │   ├── TradesTable.tsx
-│       │   ├── ParamForm.tsx           动态参数表单
-│       │   └── RulesTable.tsx
+│       │   └── ParamForm.tsx           动态参数表单
 │       ├── api/                  axios + WebSocket 封装 + TS 类型
 │       └── store/                Zustand store（暗色主题持久化）
 │
@@ -78,8 +66,7 @@ curosr/                          仓库根
 │   ├── bench_scan.py             串行扫描基准
 │   ├── verify_parallel.py        串/并行结果一致性验证
 │   ├── compare_vbt_legacy.py     vbt vs legacy 引擎语义对比
-│   ├── test_phase3_full.py       端到端：回测 + metrics + factor 全链路
-│   ├── test_factor.py            因子分析 API 烟雾测试
+│   ├── test_phase3_full.py       端到端：回测 + metrics 全链路
 │   ├── test_parallel_api.py      并行回测 API 烟雾测试
 │   ├── cleanup_stale_tasks.py    重置卡死的 running/pending 任务
 │   └── smoke_test.py             小样本回归（5 个已知样本）
@@ -104,18 +91,17 @@ curosr/                          仓库根
    Parquet 列存
         │  load_no_cache (回测/扫描时用)
         ▼
-   ┌─────────────┬────────────────┬──────────────┐
-   ▼             ▼                ▼              ▼
- strategy.scan  diagnose.check  simulate(legacy/vbt)  factor.ic_table
-   │             │                │              │
-   ▼             ▼                ▼              ▼
- ScanResult   DiagnoseReport    SimResult      ICRow + Quantile
+   ┌─────────────┬────────────────┐
+   ▼             ▼
+ strategy.scan  simulate(legacy/vbt)
+   │             │
+   ▼             ▼
+ ScanResult     SimResult
 
 回测任务：scan(扫所有日期) → 收集 hits → simulate_batch（按 code 批量）
             → SQLite (BacktestTask + BacktestTrade)
             → WebSocket 推 progress → 前端 Backtest 页
             → /metrics（夏普/Calmar/月度热力图）→ 前端图表
-            → /factor/analysis → 前端因子分析页
             → /trades.csv → 浏览器下载
 ```
 
@@ -175,6 +161,15 @@ npm run dev
 
 进入 `数据管理` 或 `仪表盘` 页面，点 **重建全市场缓存** —— 5–8 分钟生成 5481 只 Parquet（约 350 MB）。
 
+也可以在“数据管理 → 通达信官方数据更新”中点击 **下载最新数据并构建**。系统会：
+
+1. 请求一次通达信轻量更新信息；
+2. 仅在官方版本变化时下载 `https://data.tdx.com.cn/vipdoc/hsjday.zip`（约 500MB）；
+3. 原子解压沪深 `.day` 到现有 `raw` 目录；
+4. 自动执行 Parquet 增量构建。
+
+任务在后台运行，页面轮询只读取本机状态，不会反复访问通达信。为避免每次启动都下载大文件，实际下载仍需用户显式点击触发；版本未变化时复用本地 ZIP。
+
 ### 拉取股票名称（5500+ 只）
 
 ```powershell
@@ -182,6 +177,21 @@ uv run python scripts/build_stock_names.py
 ```
 
 写入 `../data/cache/stock_names.json`，前端各页就能在代码旁显示中文名了。
+
+### 情绪周期与开盘啦缓存（可选）
+
+“情绪周期”页面默认只使用本地 Parquet 行情；打开页面或刷新页面不会访问外部接口。选择交易日并点击 **同步并缓存** 后，系统会先计算并保存本地涨跌家数、涨跌停、百日新高和连板梯队。同一日期再次同步直接读取数据库缓存。
+
+题材归因等本地行情无法可靠推导的字段，可在仓库根目录 `.env` 中启用开盘啦增强数据源：
+
+```dotenv
+STOCKMODEL_KAIPANLA_ENABLED=true
+STOCKMODEL_KAIPANLA_DEVICE_ID=你的本机设备标识
+STOCKMODEL_KAIPANLA_USER_ID=你的用户标识
+STOCKMODEL_KAIPANLA_TOKEN=你的访问令牌
+```
+
+凭据只保存在本机 `.env`，不要提交到仓库。外部原始响应按“接口 + 日期 + 参数”缓存；只有主动点击同步才可能发起请求，普通刷新不会请求。“强制重同步”仅用于缓存异常或接口映射调整后重新抓取。
 
 ---
 
@@ -192,11 +202,12 @@ uv run python scripts/build_stock_names.py
 | GET | `/api/health` | 后端 + 数据状态 |
 | GET | `/api/strategies` | 列出可用策略 + 参数 schema |
 | POST | `/api/scan` | 给定日期跑一次扫描 |
-| GET | `/api/diagnose/{code}?date=` | 个股逐规则诊断 |
 | GET | `/api/kline/{code}?last_n=` | K 线 + MA + 成交量 |
 | GET | `/api/data/stats` | 缓存统计 |
 | POST | `/api/data/build` | 触发重建缓存（异步） |
 | GET | `/api/data/build/status` | 查询构建进度 |
+| POST | `/api/data/tdx-sync` | 检查并下载通达信官方日线包，随后增量构建 |
+| GET | `/api/data/tdx-sync/status` | 查询下载/解压/构建状态（不联网） |
 | POST | `/api/backtest` | 创建回测任务（含 `engine: legacy/vectorbt`、`num_workers`、`max_codes`） |
 | GET | `/api/backtest/history?limit=` | 历史任务列表 |
 | GET | `/api/backtest/{id}` | 任务详情 |
@@ -204,7 +215,9 @@ uv run python scripts/build_stock_names.py
 | GET | `/api/backtest/{id}/metrics` | 月度热力图 + 净值曲线 |
 | GET | `/api/backtest/{id}/trades.csv` | 导出 CSV（UTF-8 BOM，Excel 直开不乱码） |
 | DELETE | `/api/backtest/{id}` | 删除任务 |
-| GET | `/api/factor/analysis?task_id=` | IC 表 + 因子×分位 收益结构 |
+| GET | `/api/sentiment/matrix?limit=` | 已缓存情绪周期矩阵 |
+| GET | `/api/sentiment/{date}` | 单日情绪周期快照（只读缓存） |
+| POST | `/api/sentiment/{date}/sync` | 主动同步并缓存，支持 `force=true` |
 | WS | `/ws/backtest/{id}` | 实时进度推送 |
 
 ---
@@ -254,16 +267,6 @@ calmar  = cagr_pct / |max_dd|
 
 worker 通过 `cfg["engine"]` 条件 `import vectorbt`，不用时不加载（避免 5s+ JIT 编译开销）。
 
-### 因子分析
-
-13 个因子（综合评分、突破幅度、量比、MACD、回踩幅度、均线粘合、收盘相对 MA30/60 日低、实体比、当日涨幅、多头组数等）：
-
-- IC：Spearman 秩相关 vs 单笔收益 / 最大上涨
-- 分位：N 分位组内 平均/中位/胜率/大赚率
-- 热力图：13 因子 × 5 分位 一图直观对比
-
----
-
 ## 已知限制 / 后续
 
 - VectorBT 引擎语义不严格匹配 legacy（前端已 tooltip 标注实验性）
@@ -283,7 +286,7 @@ uv run python scripts/verify_parallel.py
 # 全市场并行基准
 $env:WORKERS = "8"; uv run python scripts/bench_backtest.py
 
-# 端到端测试（回测 + metrics + factor + 引擎对比）
+# 端到端测试（回测 + metrics + 引擎对比）
 uv run python scripts/test_phase3_full.py
 
 # 重置卡死的 running 任务

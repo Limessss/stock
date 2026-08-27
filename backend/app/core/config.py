@@ -50,6 +50,15 @@ class Settings(BaseSettings):
     llm_model: str = "gpt-4o-mini"
     llm_timeout: float = 60.0
 
+    # === 开盘啦可选增强数据源 ===
+    # 默认关闭；开启后也只会由情绪周期的显式同步接口触发，不参与普通页面查询。
+    kaipanla_enabled: bool = False
+    kaipanla_user_id: str = ""
+    kaipanla_token: str = ""
+    kaipanla_device_id: str = ""
+    kaipanla_version: str = "6.2.20.2"
+    kaipanla_timeout: float = 15.0
+
     def model_post_init(self, __context) -> None:
         if self.raw_dir is None:
             self.raw_dir = self.data_dir / "raw"

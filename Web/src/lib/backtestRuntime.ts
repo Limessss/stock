@@ -35,7 +35,7 @@ export const DEFAULT_BACKTEST_RUNTIME: BacktestRuntimeState = {
   tPlus1: true,
 };
 
-/** 转为 API 请求体（回测页 createBacktest / AI 调参 quick-backtest 共用） */
+/** 转为回测 API 请求体。 */
 export function toBacktestApiPayload(rt: BacktestRuntimeState) {
   return {
     start_date: rt.startDate.format("YYYY-MM-DD"),

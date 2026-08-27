@@ -53,7 +53,7 @@ def get_session() -> Iterator[Session]:
 def init_db() -> None:
     """启动时创建所有未存在的表，并补齐新增列。"""
     # 触发 model 类被导入以注册到 metadata
-    from ..models import backtest, tuning  # noqa: F401
+    from ..models import backtest, market, review_note, sentiment  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
     _migrate_columns()
@@ -95,3 +95,17 @@ def _migrate_columns() -> None:
             for col, typedef in adds:
                 if col not in existing:
                     conn.execute(text(f"ALTER TABLE backtest_trade ADD COLUMN {col} {typedef}"))
+
+        if "sentiment_ladder_item" in insp.get_table_names():
+            existing = {c["name"] for c in insp.get_columns("sentiment_ladder_item")}
+            if "limit_time" not in existing:
+                conn.execute(text(
+                    "ALTER TABLE sentiment_ladder_item ADD COLUMN limit_time INTEGER"
+                ))
+
+        if "sentiment_daily" in insp.get_table_names():
+            existing = {c["name"] for c in insp.get_columns("sentiment_daily")}
+            if "limit_down_stocks" not in existing:
+                conn.execute(text(
+                    "ALTER TABLE sentiment_daily ADD COLUMN limit_down_stocks JSON DEFAULT '[]'"
+                ))

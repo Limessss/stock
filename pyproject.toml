@@ -20,13 +20,14 @@ dependencies = [
     "pandas>=2.2",
     "numpy>=1.26,<3",
     "pyarrow>=15",
-    "scipy>=1.13",
     # 工具
     "python-dotenv>=1.0",
     "rich>=13.7",
     "akshare>=1.18.64",
     "httpx>=0.27",
     "openai>=1.40",
+    "pypinyin>=0.53",
+    "pytdx>=1.72",
 ]
 
 [project.optional-dependencies]

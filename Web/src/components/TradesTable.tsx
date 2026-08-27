@@ -1,5 +1,5 @@
-import { Table, Tag, Typography } from "antd";
-import type { ColumnsType } from "antd/es/table";
+import { Table, Tag, Typography } from "@/components/ui";
+import type { ColumnsType } from "@/components/ui";
 
 import type { BacktestTrade } from "@/api/backtest";
 import type { StockKlineTarget } from "@/components/StockKlineModal";

@@ -12,9 +12,12 @@ import {
   type SeriesMarker,
   type MouseEventParams,
   type Time,
+  type Range,
+  type WhitespaceData,
 } from "lightweight-charts";
 
-import type { KlineResponse } from "@/api/diagnose";
+import type { KlineResponse } from "@/api/kline";
+import type { GannLine } from "@/api/gann";
 
 export interface KlineBarInfo {
   date: string;
@@ -24,6 +27,16 @@ export interface KlineBarInfo {
   close: number;
   changePct: number | null;
   amount: number | null;
+}
+
+export interface KlineVisibleRange {
+  from: string;
+  to: string;
+}
+
+export interface KlineSelectedRange extends KlineVisibleRange {
+  clientX: number;
+  clientY: number;
 }
 
 function fmtPrice(v: number): string {
@@ -40,6 +53,22 @@ function fmtAmount(v: number | null): string {
   if (v >= 1e8) return `${(v / 1e8).toFixed(2)}亿`;
   if (v >= 1e4) return `${(v / 1e4).toFixed(2)}万`;
   return `${v.toFixed(0)}元`;
+}
+
+/** 成交量 Y 轴：通达信 volume 单位为手，显示为万手 / 亿手。 */
+function fmtVolumeAxis(v: number): string {
+  const abs = Math.abs(v);
+  if (abs >= 1e8) {
+    const x = v / 1e8;
+    const digits = x >= 100 ? 0 : x >= 10 ? 1 : 2;
+    return `${x.toFixed(digits)}亿`;
+  }
+  if (abs >= 1e4) {
+    const x = v / 1e4;
+    const digits = x >= 100 ? 0 : x >= 10 ? 1 : 2;
+    return `${x.toFixed(digits)}万`;
+  }
+  return `${Math.round(v)}`;
 }
 
 function buildBarDetailsMap(candles: KlineResponse["candles"]): Map<string, KlineBarInfo> {
@@ -177,9 +206,14 @@ export interface KlineMarker {
   text?: string;
 }
 
+type CandleSeriesPoint = CandlestickData<Time> | WhitespaceData<Time>;
+
 interface PreparedChartData {
-  candles: CandlestickData<Time>[];
+  candles: CandleSeriesPoint[];
   volume: HistogramData<Time>[];
+  macd: HistogramData<Time>[];
+  dif: LineData<Time>[];
+  dea: LineData<Time>[];
   ma5: LineData<Time>[];
   ma20: LineData<Time>[];
   ma60: LineData<Time>[];
@@ -225,28 +259,61 @@ function lineDataForMarkers(
   return out;
 }
 
-function prepareChartData(data: KlineResponse, markers?: KlineMarker[]): PreparedChartData {
-  const candlesRaw = sortUniqueByTime(data.candles ?? []);
-  const volumeRaw = sortUniqueByTime(data.volume ?? []);
-  const ma5Raw = sortUniqueByTime(data.ma5 ?? []);
-  const ma20Raw = sortUniqueByTime(data.ma20 ?? []);
-  const ma60Raw = sortUniqueByTime(data.ma60 ?? []);
+function prepareChartData(
+  data: KlineResponse,
+  markers?: KlineMarker[],
+  timeDomain?: string[]
+): PreparedChartData {
+  const domain = timeDomain?.length
+    ? [...new Set(timeDomain.map(normDate))].sort(compareDate)
+    : null;
+  const domainSet = domain ? new Set(domain) : null;
+  const inDomain = <T extends { time: string }>(items: T[]): T[] => (
+    domainSet ? items.filter((item) => domainSet.has(normDate(item.time))) : items
+  );
+  const candlesRaw = inDomain(sortUniqueByTime(data.candles ?? []));
+  const volumeRaw = inDomain(sortUniqueByTime(data.volume ?? []));
+  const macdRaw = inDomain(sortUniqueByTime(data.macd ?? []));
+  const difRaw = inDomain(sortUniqueByTime(data.dif ?? []));
+  const deaRaw = inDomain(sortUniqueByTime(data.dea ?? []));
+  const ma5Raw = inDomain(sortUniqueByTime(data.ma5 ?? []));
+  const ma20Raw = inDomain(sortUniqueByTime(data.ma20 ?? []));
+  const ma60Raw = inDomain(sortUniqueByTime(data.ma60 ?? []));
   const markersRaw = sortMarkers(markers ?? []);
 
   const candleTimes = candlesRaw.map((c) => c.time);
   assertAscTimes("candles", candleTimes);
 
-  const candles: CandlestickData<Time>[] = candlesRaw.map((c) => ({
-    time: toBusinessDay(c.time),
-    open: c.open,
-    high: c.high,
-    low: c.low,
-    close: c.close,
-  }));
+  const candleByDate = new Map(candlesRaw.map((c) => [normDate(c.time), c]));
+  const candleDates = domain ?? candlesRaw.map((c) => normDate(c.time));
+  const candles: CandleSeriesPoint[] = candleDates.map((date) => {
+    const c = candleByDate.get(date);
+    if (!c) return { time: toBusinessDay(date) };
+    return {
+      time: toBusinessDay(c.time),
+      open: c.open,
+      high: c.high,
+      low: c.low,
+      close: c.close,
+    };
+  });
   const volume: HistogramData<Time>[] = volumeRaw.map((v) => ({
     time: toBusinessDay(v.time),
     value: v.value,
     color: v.color,
+  }));
+  const macd: HistogramData<Time>[] = macdRaw.map((v) => ({
+    time: toBusinessDay(v.time),
+    value: v.value,
+    color: v.color,
+  }));
+  const dif: LineData<Time>[] = difRaw.map((p) => ({
+    time: toBusinessDay(p.time),
+    value: p.value,
+  }));
+  const dea: LineData<Time>[] = deaRaw.map((p) => ({
+    time: toBusinessDay(p.time),
+    value: p.value,
   }));
   const ma5: LineData<Time>[] = ma5Raw.map((p) => ({
     time: toBusinessDay(p.time),
@@ -269,11 +336,16 @@ function prepareChartData(data: KlineResponse, markers?: KlineMarker[]): Prepare
   }));
   const belowMarkers = markerList.filter((m) => m.position === "belowBar");
   const aboveMarkers = markerList.filter((m) => m.position !== "belowBar");
-  const closeByDate = buildCloseByDate(candles);
+  const closeByDate = buildCloseByDate(candles.filter(
+    (point): point is CandlestickData<Time> => "close" in point
+  ));
 
   return {
     candles,
     volume,
+    macd,
+    dif,
+    dea,
     ma5,
     ma20,
     ma60,
@@ -287,16 +359,29 @@ function prepareChartData(data: KlineResponse, markers?: KlineMarker[]): Prepare
 interface Props {
   data?: KlineResponse;
   markers?: KlineMarker[];
+  gannLines?: GannLine[];
   height?: number;
   /** 初始视口以该交易日为中心 */
   focusDate?: string;
   /** 视口可见 K 线根数（默认 100） */
   visibleBars?: number;
+  /** 多图联动时由父级传入的统一悬停日期 */
+  syncDate?: string | null;
+  /** 多图共用的交易日历；缺失交易日以空白 K 线占位，避免停牌导致横轴错位 */
+  timeDomain?: string[];
+  /** 当前图表悬停日期变化时通知父级 */
+  onHoverDate?: (date: string | null) => void;
+  /** 多图联动时由父级传入的统一可视日期区间 */
+  syncVisibleRange?: KlineVisibleRange | null;
+  /** 当前图表缩放或平移后通知父级 */
+  onVisibleRangeChange?: (range: KlineVisibleRange) => void;
+  /** 按住鼠标左键拖拽选择日期区间 */
+  onRangeSelect?: (range: KlineSelectedRange) => void;
 }
 
 function applyFocusRange(
   chart: IChartApi,
-  candles: CandlestickData<Time>[],
+  candles: CandleSeriesPoint[],
   focusDate: string,
   visibleBars: number
 ): void {
@@ -339,27 +424,54 @@ function syncChartLayout(
   return true;
 }
 
+function prepareGannLineData(line: GannLine): LineData<Time>[] {
+  return sortUniqueByTime(line.points).map((p) => ({
+    time: toBusinessDay(p.time),
+    value: p.value,
+  }));
+}
+
 export default function KlineChart({
   data,
   markers,
+  gannLines,
   height = 480,
   focusDate,
   visibleBars = 100,
+  syncDate,
+  timeDomain,
+  onHoverDate,
+  syncVisibleRange,
+  onVisibleRangeChange,
+  onRangeSelect,
 }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const candleRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const volumeRef = useRef<ISeriesApi<"Histogram"> | null>(null);
+  const macdRef = useRef<ISeriesApi<"Histogram"> | null>(null);
+  const difRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const deaRef = useRef<ISeriesApi<"Line"> | null>(null);
   const ma5Ref = useRef<ISeriesApi<"Line"> | null>(null);
   const ma20Ref = useRef<ISeriesApi<"Line"> | null>(null);
   const ma60Ref = useRef<ISeriesApi<"Line"> | null>(null);
   const belowMarkerRef = useRef<ISeriesApi<"Line"> | null>(null);
   const aboveMarkerRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const gannSeriesRef = useRef<ISeriesApi<"Line">[]>([]);
   const preparedRef = useRef<PreparedChartData | null>(null);
   const focusDateRef = useRef(focusDate);
   const visibleBarsRef = useRef(visibleBars);
+  const rangeEventsReadyRef = useRef(false);
+  const applyingRangeRef = useRef(false);
+  const selectionDragRef = useRef<{ startX: number; startDate: string } | null>(null);
   const [chartReady, setChartReady] = useState(false);
   const [hoverBar, setHoverBar] = useState<KlineBarInfo | null>(null);
+  const [selectionVisual, setSelectionVisual] = useState<{
+    startX: number;
+    currentX: number;
+    from: string;
+    to: string;
+  } | null>(null);
 
   useEffect(() => {
     focusDateRef.current = focusDate;
@@ -372,22 +484,17 @@ export default function KlineChart({
   const prepared = useMemo(() => {
     if (!data) return null;
     try {
-      return prepareChartData(data, markers);
+      return prepareChartData(data, markers, timeDomain);
     } catch (e) {
       console.error("[KlineChart] prepare data failed", e, data);
       return null;
     }
-  }, [data, markers]);
+  }, [data, markers, timeDomain]);
 
   const barDetails = useMemo(
     () => (data?.candles ? buildBarDetailsMap(data.candles) : new Map<string, KlineBarInfo>()),
     [data?.candles]
   );
-
-  useEffect(() => {
-    const lastDate = [...barDetails.keys()].sort().at(-1);
-    setHoverBar(lastDate ? barDetails.get(lastDate) ?? null : null);
-  }, [barDetails]);
 
   useEffect(() => {
     preparedRef.current = prepared;
@@ -420,6 +527,12 @@ export default function KlineChart({
         horzLines: { color: "#f0f0f0" },
       },
       crosshair: { mode: CrosshairMode.Normal },
+      handleScroll: {
+        mouseWheel: true,
+        pressedMouseMove: !onRangeSelect,
+        horzTouchDrag: true,
+        vertTouchDrag: true,
+      },
       timeScale: {
         borderColor: "#d1d5db",
         rightOffset: 6,
@@ -427,7 +540,7 @@ export default function KlineChart({
         fixRightEdge: true,
         minBarSpacing: 0.5,
       },
-      rightPriceScale: { borderColor: "#d1d5db" },
+      rightPriceScale: { borderColor: "#d1d5db", scaleMargins: { top: 0.04, bottom: 0.28 } },
     });
     chartRef.current = chart;
 
@@ -440,12 +553,43 @@ export default function KlineChart({
     });
 
     volumeRef.current = chart.addHistogramSeries({
-      priceFormat: { type: "volume" },
+      priceFormat: {
+        type: "custom",
+        formatter: fmtVolumeAxis,
+        minMove: 1,
+      },
       priceScaleId: "volume",
       color: "#bdbdbd",
     });
     chart.priceScale("volume").applyOptions({
-      scaleMargins: { top: 0.8, bottom: 0 },
+      scaleMargins: { top: 0.74, bottom: 0.14 },
+    });
+
+    macdRef.current = chart.addHistogramSeries({
+      priceScaleId: "macd",
+      color: "#bdbdbd",
+      priceLineVisible: false,
+      lastValueVisible: false,
+    });
+    chart.priceScale("macd").applyOptions({
+      scaleMargins: { top: 0.88, bottom: 0.02 },
+    });
+
+    difRef.current = chart.addLineSeries({
+      priceScaleId: "macd",
+      color: "#f6c022",
+      lineWidth: 1,
+      priceLineVisible: false,
+      lastValueVisible: false,
+      crosshairMarkerVisible: false,
+    });
+    deaRef.current = chart.addLineSeries({
+      priceScaleId: "macd",
+      color: "#2196f3",
+      lineWidth: 1,
+      priceLineVisible: false,
+      lastValueVisible: false,
+      crosshairMarkerVisible: false,
     });
 
     ma5Ref.current = chart.addLineSeries({
@@ -477,23 +621,30 @@ export default function KlineChart({
       setChartReady(false);
       ro.disconnect();
       window.removeEventListener("resize", layoutChart);
+      gannSeriesRef.current = [];
       chart.remove();
       chartRef.current = null;
       candleRef.current = null;
       volumeRef.current = null;
+      macdRef.current = null;
+      difRef.current = null;
+      deaRef.current = null;
       ma5Ref.current = null;
       ma20Ref.current = null;
       ma60Ref.current = null;
       belowMarkerRef.current = null;
       aboveMarkerRef.current = null;
     };
-  }, [height, layoutChart]);
+  }, [height, layoutChart, onRangeSelect]);
 
   useEffect(() => {
     if (!chartReady || !prepared || !candleRef.current) return;
     try {
       candleRef.current.setData(prepared.candles);
       volumeRef.current?.setData(prepared.volume);
+      macdRef.current?.setData(prepared.macd);
+      difRef.current?.setData(prepared.dif);
+      deaRef.current?.setData(prepared.dea);
       ma5Ref.current?.setData(prepared.ma5);
       ma20Ref.current?.setData(prepared.ma20);
       ma60Ref.current?.setData(prepared.ma60);
@@ -515,27 +666,218 @@ export default function KlineChart({
 
   useEffect(() => {
     const chart = chartRef.current;
-    if (!chartReady || !chart || barDetails.size === 0) return;
+    if (!chartReady || !chart) return;
 
-    const lastDate = [...barDetails.keys()].sort().at(-1);
-    const lastBar = lastDate ? barDetails.get(lastDate) ?? null : null;
+    for (const series of gannSeriesRef.current) {
+      chart.removeSeries(series);
+    }
+    gannSeriesRef.current = [];
+
+    if (!gannLines?.length) return;
+
+    for (const line of gannLines) {
+      const pts = prepareGannLineData(line);
+      if (pts.length < 2) continue;
+      const series = chart.addLineSeries({
+        color: line.color,
+        lineWidth: line.label.includes("1×1") ? 2 : 1,
+        lineStyle: line.label.includes("1×1") ? 0 : 2,
+        priceLineVisible: false,
+        lastValueVisible: false,
+        crosshairMarkerVisible: false,
+        // 江恩线不参与纵轴 autoscale，避免 8×1 远点把 K 线压扁
+        autoscaleInfoProvider: () => null,
+      });
+      series.setData(pts);
+      gannSeriesRef.current.push(series);
+    }
+    layoutChart();
+  }, [chartReady, gannLines, layoutChart]);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+    const container = containerRef.current;
+    if (!chartReady || !chart || barDetails.size === 0) return;
 
     const onCrosshairMove = (param: MouseEventParams<Time>) => {
       if (!param.time) {
-        setHoverBar(lastBar);
+        setHoverBar(null);
+        onHoverDate?.(null);
         return;
       }
       const key = businessDayKey(param.time);
-      setHoverBar(barDetails.get(key) ?? lastBar);
+      setHoverBar(barDetails.get(key) ?? null);
+      onHoverDate?.(key);
+    };
+
+    const onMouseLeave = () => {
+      setHoverBar(null);
+      onHoverDate?.(null);
     };
 
     chart.subscribeCrosshairMove(onCrosshairMove);
-    return () => chart.unsubscribeCrosshairMove(onCrosshairMove);
-  }, [chartReady, barDetails]);
+    container?.addEventListener("mouseleave", onMouseLeave);
+    return () => {
+      chart.unsubscribeCrosshairMove(onCrosshairMove);
+      container?.removeEventListener("mouseleave", onMouseLeave);
+    };
+  }, [chartReady, barDetails, onHoverDate]);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+    const series = candleRef.current;
+    if (!chartReady || !chart || !series) return;
+    if (!syncDate) {
+      chart.clearCrosshairPosition();
+      setHoverBar(null);
+      return;
+    }
+    const targetDate = normDate(syncDate);
+    const bar = barDetails.get(targetDate);
+    setHoverBar(bar ?? null);
+    let crosshairPrice = bar?.close;
+    if (crosshairPrice == null) {
+      let nearestBefore: KlineBarInfo | null = null;
+      let nearestAfter: KlineBarInfo | null = null;
+      for (const candidate of barDetails.values()) {
+        if (candidate.date < targetDate) nearestBefore = candidate;
+        if (candidate.date > targetDate) {
+          nearestAfter = candidate;
+          break;
+        }
+      }
+      crosshairPrice = nearestBefore?.close ?? nearestAfter?.close;
+    }
+    if (crosshairPrice != null) {
+      chart.setCrosshairPosition(crosshairPrice, toBusinessDay(targetDate), series);
+    }
+  }, [barDetails, chartReady, syncDate]);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chartReady || !chart || !onVisibleRangeChange) return;
+    const timeScale = chart.timeScale();
+    const handleRangeChange = (range: Range<Time> | null) => {
+      if (!range || !rangeEventsReadyRef.current || applyingRangeRef.current) return;
+      onVisibleRangeChange({
+        from: businessDayKey(range.from),
+        to: businessDayKey(range.to),
+      });
+    };
+    timeScale.subscribeVisibleTimeRangeChange(handleRangeChange);
+    return () => timeScale.unsubscribeVisibleTimeRangeChange(handleRangeChange);
+  }, [chartReady, onVisibleRangeChange]);
+
+  useEffect(() => {
+    rangeEventsReadyRef.current = false;
+    if (!chartReady || !prepared) return;
+    const timer = window.setTimeout(() => {
+      rangeEventsReadyRef.current = true;
+    }, 160);
+    return () => window.clearTimeout(timer);
+  }, [chartReady, prepared]);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chartReady || !chart || !prepared || !syncVisibleRange) return;
+    const timeScale = chart.timeScale();
+    const current = timeScale.getVisibleRange();
+    if (
+      current
+      && businessDayKey(current.from) === syncVisibleRange.from
+      && businessDayKey(current.to) === syncVisibleRange.to
+    ) {
+      return;
+    }
+    applyingRangeRef.current = true;
+    timeScale.setVisibleRange({
+      from: toBusinessDay(syncVisibleRange.from),
+      to: toBusinessDay(syncVisibleRange.to),
+    });
+    requestAnimationFrame(() => {
+      applyingRangeRef.current = false;
+    });
+  }, [chartReady, prepared, syncVisibleRange]);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+    const container = containerRef.current;
+    if (!chartReady || !chart || !container || !onRangeSelect) return;
+
+    const dateAtClientX = (clientX: number): { x: number; date: string } | null => {
+      const rect = container.getBoundingClientRect();
+      const width = chart.timeScale().width();
+      const x = Math.max(0, Math.min(width - 1, clientX - rect.left));
+      const time = chart.timeScale().coordinateToTime(x);
+      return time == null ? null : { x, date: businessDayKey(time) };
+    };
+
+    const handleMouseDown = (event: MouseEvent) => {
+      if (event.button !== 0) return;
+      const start = dateAtClientX(event.clientX);
+      if (!start) return;
+      selectionDragRef.current = { startX: start.x, startDate: start.date };
+      setSelectionVisual({ startX: start.x, currentX: start.x, from: start.date, to: start.date });
+    };
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const drag = selectionDragRef.current;
+      if (!drag) return;
+      const current = dateAtClientX(event.clientX);
+      if (!current) return;
+      const from = drag.startDate <= current.date ? drag.startDate : current.date;
+      const to = drag.startDate <= current.date ? current.date : drag.startDate;
+      setSelectionVisual({ startX: drag.startX, currentX: current.x, from, to });
+    };
+
+    const handleMouseUp = (event: MouseEvent) => {
+      const drag = selectionDragRef.current;
+      selectionDragRef.current = null;
+      if (!drag) return;
+      const current = dateAtClientX(event.clientX);
+      setSelectionVisual(null);
+      if (!current || Math.abs(current.x - drag.startX) < 8 || current.date === drag.startDate) return;
+      onRangeSelect({
+        from: drag.startDate <= current.date ? drag.startDate : current.date,
+        to: drag.startDate <= current.date ? current.date : drag.startDate,
+        clientX: event.clientX,
+        clientY: event.clientY,
+      });
+    };
+
+    container.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      selectionDragRef.current = null;
+      container.removeEventListener("mousedown", handleMouseDown);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [chartReady, onRangeSelect]);
 
   return (
-    <div style={{ position: "relative", width: "100%", height }}>
+    <div
+      className={`kline-chart-root${onRangeSelect ? " is-range-selectable" : ""}`}
+      data-sync-visible-from={syncVisibleRange?.from}
+      data-sync-visible-to={syncVisibleRange?.to}
+      data-time-domain-start={timeDomain?.[0]}
+      data-time-domain-end={timeDomain?.[timeDomain.length - 1]}
+      data-time-domain-count={timeDomain?.length}
+      style={{ position: "relative", width: "100%", height }}
+    >
       <div ref={containerRef} style={{ width: "100%", height }} />
+      {selectionVisual && (
+        <div
+          className="kline-range-selection"
+          style={{
+            left: Math.min(selectionVisual.startX, selectionVisual.currentX),
+            width: Math.max(1, Math.abs(selectionVisual.currentX - selectionVisual.startX)),
+          }}
+        >
+          <span>{selectionVisual.from} → {selectionVisual.to}</span>
+        </div>
+      )}
       <KlineHoverPanel bar={hoverBar} />
     </div>
   );

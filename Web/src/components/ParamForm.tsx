@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Col, Collapse, InputNumber, Row, Switch, Tooltip, Typography } from "antd";
+import { Col, Collapse, InputNumber, Row, Switch, Tooltip, Typography } from "@/components/ui";
 
 import type { StrategyParamSchema } from "@/api/scan";
 import { getParamDesc, getParamLabel, getTypeLabel } from "@/utils/paramLabels";
@@ -91,7 +91,7 @@ export default function ParamForm({ schema, value, onChange }: Props) {
   }, [schema]);
 
   const renderGroup = (fields: [string, StrategyParamSchema][]) => (
-    <Row gutter={[16, 12]}>
+    <Row gutter={[16, 14]} className="parameter-grid">
       {fields.map(([k, s]) => {
         const label = getParamLabel(k);
         const desc = getParamDesc(k);

@@ -1,4 +1,4 @@
-import { Empty, Card } from "antd";
+import { Empty, Card } from "@/components/ui";
 
 interface Props {
   title: string;

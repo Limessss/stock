@@ -38,9 +38,9 @@ import {
 
   message,
 
-} from "antd";
+} from "@/components/ui";
 
-import { ArrowLeftOutlined, ReloadOutlined, RobotOutlined, SaveOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, ReloadOutlined, SaveOutlined } from "@/components/ui/icons";
 
 import { Link, useNavigate, useParams } from "react-router-dom";
 
@@ -336,12 +336,6 @@ export default function StrategyDetailPage() {
 
             </Button>
 
-            <Link to={`/tuning?strategy=${name}`}>
-
-              <Button icon={<RobotOutlined />}>AI 调参</Button>
-
-            </Link>
-
             <div>
 
               <Title level={4} style={{ margin: 0 }}>
@@ -540,7 +534,7 @@ export default function StrategyDetailPage() {
 
                     label="设为默认策略"
 
-                    extra="开启后，选股扫描、回测、个股诊断等页面将默认选中此策略"
+                    extra="开启后，选股扫描和回测等页面将默认选中此策略"
 
                   >
 
