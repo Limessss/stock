@@ -1,9 +1,10 @@
 """情绪周期 API schema。"""
 from __future__ import annotations
 
+from datetime import date
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from ..core.time_utils import UtcDateTime
 
@@ -165,10 +166,37 @@ class LeaderPanoramaInstrument(BaseModel):
 
 
 class LeaderPanoramaConfigUpdate(BaseModel):
-    instruments: list[LeaderPanoramaInstrument] = Field(default_factory=list, max_length=16)
+    instruments: list[LeaderPanoramaInstrument] = Field(default_factory=list, max_length=100)
 
 
 class LeaderPanoramaConfigResponse(BaseModel):
     initialized: bool
     instruments: list[LeaderPanoramaInstrument] = Field(default_factory=list)
     updated_at: UtcDateTime | None = None
+
+
+class LeaderPanoramaPresetCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=80)
+    start_date: date
+    end_date: date
+    instruments: list[LeaderPanoramaInstrument] = Field(default_factory=list, max_length=100)
+
+    @model_validator(mode="after")
+    def validate_range(self) -> LeaderPanoramaPresetCreate:
+        if self.start_date > self.end_date:
+            raise ValueError("start_date must not be after end_date")
+        return self
+
+
+class LeaderPanoramaPresetResponse(BaseModel):
+    id: str
+    name: str
+    start_date: str
+    end_date: str
+    instruments: list[LeaderPanoramaInstrument] = Field(default_factory=list)
+    created_at: UtcDateTime
+    updated_at: UtcDateTime
+
+
+class LeaderPanoramaPresetListResponse(BaseModel):
+    items: list[LeaderPanoramaPresetResponse] = Field(default_factory=list)

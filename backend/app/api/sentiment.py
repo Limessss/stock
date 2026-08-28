@@ -4,14 +4,17 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from ..core.database import get_session
 from ..core.config import settings
+from ..core.database import get_session
 from ..schemas.sentiment import (
     FeedbackCreate,
     FeedbackUpdate,
     IntervalGainResponse,
     LeaderPanoramaConfigResponse,
     LeaderPanoramaConfigUpdate,
+    LeaderPanoramaPresetCreate,
+    LeaderPanoramaPresetListResponse,
+    LeaderPanoramaPresetResponse,
     MajorFirstBoardsUpdate,
     SentimentDay,
     SentimentFeedbackItem,
@@ -19,8 +22,7 @@ from ..schemas.sentiment import (
     SentimentSyncRequest,
     SentimentSyncResponse,
 )
-from ..services import sentiment_service
-from ..services import panorama_service
+from ..services import panorama_service, sentiment_service
 from ..services.interval_gain_service import get_interval_gains
 
 router = APIRouter()
@@ -55,6 +57,77 @@ def put_panorama_config(
         instruments=config.instruments or [],
         updated_at=config.updated_at,
     )
+
+
+def _panorama_preset_response(preset) -> LeaderPanoramaPresetResponse:
+    return LeaderPanoramaPresetResponse(
+        id=preset.id,
+        name=preset.name,
+        start_date=preset.start_date,
+        end_date=preset.end_date,
+        instruments=preset.instruments or [],
+        created_at=preset.created_at,
+        updated_at=preset.updated_at,
+    )
+
+
+@router.get("/sentiment/panorama/presets", response_model=LeaderPanoramaPresetListResponse)
+def get_panorama_presets(
+    session: Session = Depends(get_session),
+) -> LeaderPanoramaPresetListResponse:
+    return LeaderPanoramaPresetListResponse(
+        items=[_panorama_preset_response(item) for item in panorama_service.list_presets(session)]
+    )
+
+
+@router.post("/sentiment/panorama/presets", response_model=LeaderPanoramaPresetResponse)
+def post_panorama_preset(
+    body: LeaderPanoramaPresetCreate,
+    session: Session = Depends(get_session),
+) -> LeaderPanoramaPresetResponse:
+    preset = panorama_service.create_preset(
+        session,
+        name=body.name,
+        start_date=body.start_date.isoformat(),
+        end_date=body.end_date.isoformat(),
+        instruments=[item.model_dump() for item in body.instruments],
+    )
+    session.commit()
+    return _panorama_preset_response(preset)
+
+
+@router.put(
+    "/sentiment/panorama/presets/{preset_id}",
+    response_model=LeaderPanoramaPresetResponse,
+)
+def put_panorama_preset(
+    preset_id: str,
+    body: LeaderPanoramaPresetCreate,
+    session: Session = Depends(get_session),
+) -> LeaderPanoramaPresetResponse:
+    preset = panorama_service.update_preset(
+        session,
+        preset_id,
+        name=body.name,
+        start_date=body.start_date.isoformat(),
+        end_date=body.end_date.isoformat(),
+        instruments=[item.model_dump() for item in body.instruments],
+    )
+    if preset is None:
+        raise HTTPException(404, "区间方案不存在")
+    session.commit()
+    return _panorama_preset_response(preset)
+
+
+@router.delete("/sentiment/panorama/presets/{preset_id}")
+def delete_panorama_preset(
+    preset_id: str,
+    session: Session = Depends(get_session),
+) -> dict[str, str]:
+    if not panorama_service.delete_preset(session, preset_id):
+        raise HTTPException(404, "区间方案不存在")
+    session.commit()
+    return {"status": "ok"}
 
 
 @router.get("/sentiment/matrix", response_model=SentimentMatrixResponse)

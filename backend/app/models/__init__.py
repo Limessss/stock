@@ -3,6 +3,7 @@ from .market import MarketDailySummary, MarketIndexDaily
 from .sentiment import (
     ExternalApiSnapshot,
     LeaderPanoramaConfig,
+    LeaderPanoramaPreset,
     SentimentDaily,
     SentimentFeedback,
     SentimentLadderItem,
@@ -18,6 +19,7 @@ __all__ = [
     "SentimentDaily",
     "ExternalApiSnapshot",
     "LeaderPanoramaConfig",
+    "LeaderPanoramaPreset",
     "SentimentTheme",
     "SentimentLadderItem",
     "SentimentFeedback",

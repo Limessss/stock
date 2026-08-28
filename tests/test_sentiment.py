@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from backend.app.core.config import settings
 from backend.app.core.database import Base
 from backend.app.models.sentiment import SentimentDaily, SentimentLadderItem
-from backend.app.services import sentiment_service
+from backend.app.services import panorama_service, sentiment_service
 from model.data.sentiment import (
     calculate_local_limit_downs,
     calculate_local_sentiment,
@@ -22,6 +22,78 @@ from model.data.sentiment import (
 
 
 class SentimentTests(unittest.TestCase):
+    def test_panorama_presets_persist_range_and_ordered_instruments(self) -> None:
+        engine = create_engine("sqlite:///:memory:")
+        Base.metadata.create_all(engine)
+        with Session(engine) as session:
+            preset = panorama_service.create_preset(
+                session,
+                name="机器人主升周期",
+                start_date="2026-08-03",
+                end_date="2026-08-26",
+                instruments=[
+                    {"code": "sz000001", "name": "平安银行", "type": "stock"},
+                    {"code": "SH000001", "name": "上证指数", "type": "index"},
+                    {"code": "SZ000001", "name": "重复项", "type": "stock"},
+                ],
+            )
+            session.commit()
+
+            items = panorama_service.list_presets(session)
+
+            self.assertEqual([item.id for item in items], [preset.id])
+            self.assertEqual(items[0].start_date, "2026-08-03")
+            self.assertEqual(items[0].end_date, "2026-08-26")
+            self.assertEqual(
+                items[0].instruments,
+                [
+                    {"code": "SZ000001", "name": "平安银行", "type": "stock"},
+                    {"code": "SH000001", "name": "上证指数", "type": "index"},
+                ],
+            )
+            updated = panorama_service.update_preset(
+                session,
+                preset.id,
+                name="机器人周期（更新）",
+                start_date="2026-08-04",
+                end_date="2026-08-27",
+                instruments=[
+                    {"code": f"SH60{index:04d}", "name": f"测试{index}", "type": "stock"}
+                    for index in range(105)
+                ],
+            )
+            session.commit()
+            self.assertIsNotNone(updated)
+            self.assertEqual(updated.name, "机器人周期（更新）")
+            self.assertEqual(updated.start_date, "2026-08-04")
+            self.assertEqual(len(updated.instruments), 100)
+            self.assertIsNone(
+                panorama_service.update_preset(
+                    session,
+                    "missing",
+                    name="不存在",
+                    start_date="2026-08-04",
+                    end_date="2026-08-27",
+                    instruments=[],
+                )
+            )
+            self.assertTrue(panorama_service.delete_preset(session, preset.id))
+            self.assertFalse(panorama_service.delete_preset(session, "missing"))
+            self.assertEqual(panorama_service.list_presets(session), [])
+
+    def test_panorama_preset_rejects_reversed_range(self) -> None:
+        engine = create_engine("sqlite:///:memory:")
+        Base.metadata.create_all(engine)
+        with Session(engine) as session:
+            with self.assertRaisesRegex(ValueError, "开始日期"):
+                panorama_service.create_preset(
+                    session,
+                    name="无效区间",
+                    start_date="2026-08-27",
+                    end_date="2026-08-01",
+                    instruments=[],
+                )
+
     def test_local_sentiment_calculates_limits_and_new_high(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             cache_dir = Path(temp_dir) / "cache"

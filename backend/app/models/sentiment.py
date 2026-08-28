@@ -129,3 +129,19 @@ class LeaderPanoramaConfig(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utc_now, onupdate=utc_now
     )
+
+
+class LeaderPanoramaPreset(Base):
+    """龙头周期全景图保存的日期区间与有序证券列表。"""
+
+    __tablename__ = "leader_panorama_preset"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    name: Mapped[str] = mapped_column(String(80), index=True)
+    start_date: Mapped[str] = mapped_column(String(10), index=True)
+    end_date: Mapped[str] = mapped_column(String(10), index=True)
+    instruments: Mapped[list] = mapped_column(JSON, default=list)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, onupdate=utc_now
+    )

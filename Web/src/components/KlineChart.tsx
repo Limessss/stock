@@ -377,6 +377,10 @@ interface Props {
   onVisibleRangeChange?: (range: KlineVisibleRange) => void;
   /** 按住鼠标左键拖拽选择日期区间 */
   onRangeSelect?: (range: KlineSelectedRange) => void;
+  /** 是否显示成交量副图，紧凑视图可关闭 */
+  showVolume?: boolean;
+  /** 是否显示 MACD 副图，紧凑视图可关闭 */
+  showMacd?: boolean;
 }
 
 function applyFocusRange(
@@ -444,6 +448,8 @@ export default function KlineChart({
   syncVisibleRange,
   onVisibleRangeChange,
   onRangeSelect,
+  showVolume = true,
+  showMacd = true,
 }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -521,7 +527,11 @@ export default function KlineChart({
     const chart = createChart(container, {
       width: Math.max(container.clientWidth, 1),
       height,
-      layout: { background: { type: ColorType.Solid, color: "#ffffff" }, textColor: "#333" },
+      layout: {
+        background: { type: ColorType.Solid, color: "#ffffff" },
+        textColor: "#333",
+        attributionLogo: false,
+      },
       grid: {
         vertLines: { color: "#f0f0f0" },
         horzLines: { color: "#f0f0f0" },
@@ -540,7 +550,13 @@ export default function KlineChart({
         fixRightEdge: true,
         minBarSpacing: 0.5,
       },
-      rightPriceScale: { borderColor: "#d1d5db", scaleMargins: { top: 0.04, bottom: 0.28 } },
+      rightPriceScale: {
+        borderColor: "#d1d5db",
+        scaleMargins: {
+          top: 0.04,
+          bottom: showMacd ? 0.28 : showVolume ? 0.22 : 0.06,
+        },
+      },
     });
     chartRef.current = chart;
 
@@ -560,9 +576,12 @@ export default function KlineChart({
       },
       priceScaleId: "volume",
       color: "#bdbdbd",
+      visible: showVolume,
     });
     chart.priceScale("volume").applyOptions({
-      scaleMargins: { top: 0.74, bottom: 0.14 },
+      scaleMargins: showMacd
+        ? { top: 0.74, bottom: 0.14 }
+        : { top: 0.78, bottom: 0.04 },
     });
 
     macdRef.current = chart.addHistogramSeries({
@@ -570,6 +589,7 @@ export default function KlineChart({
       color: "#bdbdbd",
       priceLineVisible: false,
       lastValueVisible: false,
+      visible: showMacd,
     });
     chart.priceScale("macd").applyOptions({
       scaleMargins: { top: 0.88, bottom: 0.02 },
@@ -582,6 +602,7 @@ export default function KlineChart({
       priceLineVisible: false,
       lastValueVisible: false,
       crosshairMarkerVisible: false,
+      visible: showMacd,
     });
     deaRef.current = chart.addLineSeries({
       priceScaleId: "macd",
@@ -590,6 +611,7 @@ export default function KlineChart({
       priceLineVisible: false,
       lastValueVisible: false,
       crosshairMarkerVisible: false,
+      visible: showMacd,
     });
 
     ma5Ref.current = chart.addLineSeries({
@@ -635,7 +657,7 @@ export default function KlineChart({
       belowMarkerRef.current = null;
       aboveMarkerRef.current = null;
     };
-  }, [height, layoutChart, onRangeSelect]);
+  }, [height, layoutChart, onRangeSelect, showMacd, showVolume]);
 
   useEffect(() => {
     if (!chartReady || !prepared || !candleRef.current) return;
