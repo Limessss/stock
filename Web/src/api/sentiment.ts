@@ -36,6 +36,7 @@ export interface SentimentLadderItem {
   code: string;
   name: string;
   board_count: number;
+  continuous_board_count: number | null;
   board_type: string;
   limit_time: number | null;
   reason: string;
@@ -101,6 +102,18 @@ export interface SentimentSyncResponse {
   statuses: Record<string, string>;
 }
 
+export interface SentimentLatestSyncResponse {
+  latest_trade_date: string;
+  window_start: string;
+  window_end: string;
+  window_days: number;
+  synced_days: number;
+  skipped_days: number;
+  synced_dates: string[];
+  network_requests: number;
+  external_statuses: Record<string, string>;
+}
+
 export interface IntervalGainItem {
   rank: number;
   code: string;
@@ -156,6 +169,17 @@ export async function syncSentimentDay(
   const { data } = await api.post<SentimentSyncResponse>(`/sentiment/${tradeDate}/sync`, {
     force,
   });
+  return data;
+}
+
+export async function syncSentimentLatest(
+  force = false
+): Promise<SentimentLatestSyncResponse> {
+  const { data } = await api.post<SentimentLatestSyncResponse>(
+    "/sentiment/sync-latest",
+    { force },
+    { timeout: 300_000 }
+  );
   return data;
 }
 

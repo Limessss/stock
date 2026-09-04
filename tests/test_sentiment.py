@@ -270,6 +270,44 @@ class SentimentTests(unittest.TestCase):
         themes = sentiment_service._parse_theme_counts(payload)
         self.assertEqual(themes[0], {"name": "商业航天", "count": 2, "rank": 1})
 
+    def test_kaipanla_parsers_accept_live_array_shapes(self) -> None:
+        payload = {
+            "StockList": [
+                [
+                    [
+                        "002084", "海鸥住工", 6, 1788139500, "801787", "实控人变更",
+                        1, 0, 1, 0, 0, "6连板", 0, 6, 6,
+                    ]
+                ]
+            ],
+            "ZhuShuList": [["803023", "AI应用", 16, 111000000, "000001,000002"]],
+        }
+
+        ladder = sentiment_service._parse_ladder(payload)
+        self.assertEqual(len(ladder), 1)
+        self.assertEqual(ladder[0]["code"], "SZ002084")
+        self.assertEqual(ladder[0]["board_count"], 6)
+        self.assertEqual(ladder[0]["board_type"], "6连板")
+        self.assertEqual(ladder[0]["limit_time"], 1788139500)
+        self.assertEqual(ladder[0]["themes"], ["实控人变更"])
+
+        self.assertEqual(
+            sentiment_service._parse_theme_counts(payload)[0],
+            {"name": "AI应用", "count": 16, "rank": 1},
+        )
+        self.assertEqual(
+            sentiment_service._parse_theme_counts(
+                {"List": [["银行", "12,5", 801027]]}
+            )[0],
+            {"name": "银行", "count": 12, "rank": 1},
+        )
+        self.assertEqual(
+            sentiment_service.kaipanla_client.payload_error(
+                {"errcode": 1020, "errmsg": "参数出错"}
+            ),
+            "errcode=1020: 参数出错",
+        )
+
     def test_sector_ranking_request_and_parser(self) -> None:
         with mock.patch.object(settings, "kaipanla_device_id", "test-device"):
             strong_request = sentiment_service.kaipanla_client.build_request(
@@ -302,6 +340,18 @@ class SentimentTests(unittest.TestCase):
                 {"name": "储能", "count": 3202, "rank": 2, "stage": "-0.948"},
             ],
         )
+
+    def test_current_sector_ranking_uses_live_request_shape(self) -> None:
+        today = pd.Timestamp.now(tz="Asia/Shanghai").strftime("%Y-%m-%d")
+        with mock.patch.object(settings, "kaipanla_device_id", "test-device"):
+            request = sentiment_service.kaipanla_client.build_request(
+                "sector_strength", today
+            )
+
+        self.assertEqual(request.url, "https://apphq.longhuvip.com/w1/api/index.php")
+        self.assertEqual(request.body["apiv"], "w21")
+        self.assertEqual(request.body["IsZZ"], "0")
+        self.assertNotIn("Date", request.body)
 
     def test_ladder_items_sort_by_limit_time_within_same_board(self) -> None:
         items = [
@@ -429,14 +479,182 @@ class SentimentTests(unittest.TestCase):
             )
             session.flush()
 
-            marked = sentiment_service._auto_mark_three_board_origins(
-                session, "2026-08-26"
-            )
+            with (
+                mock.patch.object(sentiment_service, "_continuous_board_count", return_value=3),
+                mock.patch.object(
+                    sentiment_service, "get_three_board_origin",
+                    side_effect=lambda _cache, code, _date, _name: {
+                        "SH601212": "2026-08-21", "SZ002084": "2026-08-24"
+                    }[code],
+                ),
+            ):
+                marked = sentiment_service._auto_mark_three_board_origins(
+                    session, "2026-08-26"
+                )
 
             self.assertEqual(marked, 2)
             self.assertTrue(session.get(SentimentLadderItem, "silver-first").is_major_first_board)
             self.assertTrue(session.get(SentimentLadderItem, "seagull-first").is_major_first_board)
             self.assertFalse(session.get(SentimentLadderItem, "silver-second").is_major_first_board)
+
+    def test_sync_latest_bootstraps_the_recent_window_in_one_batch(self) -> None:
+        engine = create_engine("sqlite:///:memory:")
+        Base.metadata.create_all(engine)
+        dates = ["2026-08-24", "2026-08-25", "2026-08-26"]
+
+        def batch_result(_cache_dir: Path, requested: list[str]) -> dict[str, dict]:
+            return {
+                date: {
+                    "trade_date": date,
+                    "up_count": 1,
+                    "down_count": 1,
+                    "flat_count": 0,
+                    "scanned_stock_count": 2,
+                    "limit_up_count": 0,
+                    "limit_down_count": 0,
+                    "limit_down_stocks": [],
+                    "broken_board_count": 0,
+                    "new_high_100_count": 0,
+                    "new_high_stocks": [],
+                    "ladder": [],
+                    "complete": True,
+                }
+                for date in requested
+            }
+
+        with (
+            mock.patch.object(sentiment_service, "_recent_trade_dates", return_value=dates),
+            mock.patch.object(
+                sentiment_service,
+                "calculate_local_sentiment_batch",
+                side_effect=batch_result,
+            ) as batch,
+            mock.patch.object(sentiment_service, "_sync_market_fields"),
+            mock.patch.object(
+                sentiment_service,
+                "_sync_external",
+                return_value={"network_requests": 0},
+            ),
+            mock.patch.object(sentiment_service, "_auto_mark_three_board_origins"),
+            Session(engine) as session,
+        ):
+            result = sentiment_service.sync_latest(session)
+
+            self.assertEqual(result["synced_dates"], dates)
+            self.assertEqual(result["latest_trade_date"], "2026-08-26")
+            self.assertEqual(result["synced_days"], 3)
+            batch.assert_called_once_with(settings.cache_dir, dates)
+
+    def test_sync_latest_only_fills_missing_dates_in_recent_window(self) -> None:
+        engine = create_engine("sqlite:///:memory:")
+        Base.metadata.create_all(engine)
+        dates = ["2026-08-24", "2026-08-25", "2026-08-26"]
+        missing = ["2026-08-25"]
+        local_result = {
+            "trade_date": missing[0],
+            "up_count": 1,
+            "down_count": 1,
+            "flat_count": 0,
+            "scanned_stock_count": 2,
+            "limit_up_count": 0,
+            "limit_down_count": 0,
+            "limit_down_stocks": [],
+            "broken_board_count": 0,
+            "new_high_100_count": 0,
+            "new_high_stocks": [],
+            "ladder": [],
+            "complete": True,
+        }
+
+        with Session(engine) as session:
+            session.add_all(
+                [
+                    SentimentDaily(
+                        trade_date=dates[0],
+                        local_complete=True,
+                        external_complete=True,
+                        external_status="complete",
+                    ),
+                    SentimentDaily(
+                        trade_date=dates[2],
+                        local_complete=True,
+                        external_complete=True,
+                        external_status="complete",
+                    ),
+                ]
+            )
+            session.commit()
+            with (
+                mock.patch.object(sentiment_service, "_recent_trade_dates", return_value=dates),
+                mock.patch.object(
+                    sentiment_service,
+                    "calculate_local_sentiment_batch",
+                    return_value={missing[0]: local_result},
+                ) as batch,
+                mock.patch.object(sentiment_service, "_sync_market_fields"),
+                mock.patch.object(
+                    sentiment_service,
+                    "_sync_external",
+                    return_value={"network_requests": 0},
+                ),
+                mock.patch.object(sentiment_service, "_auto_mark_three_board_origins"),
+            ):
+                result = sentiment_service.sync_latest(session)
+
+            self.assertEqual(result["synced_dates"], missing)
+            self.assertEqual(result["skipped_days"], 2)
+            batch.assert_called_once_with(settings.cache_dir, missing)
+
+    def test_sync_latest_retries_external_incomplete_date_without_local_rebuild(self) -> None:
+        engine = create_engine("sqlite:///:memory:")
+        Base.metadata.create_all(engine)
+        trade_date = "2026-08-28"
+
+        with Session(engine) as session:
+            session.add(
+                SentimentDaily(
+                    trade_date=trade_date,
+                    local_complete=True,
+                    external_complete=False,
+                    external_status="partial",
+                )
+            )
+            session.commit()
+
+            def complete_external(
+                _session: Session,
+                daily: SentimentDaily,
+                _ladder: list[dict],
+                *,
+                force: bool,
+            ) -> dict:
+                self.assertTrue(force)
+                daily.external_complete = True
+                daily.external_status = "complete"
+                return {"network_requests": 3}
+
+            with (
+                mock.patch.object(
+                    sentiment_service, "_recent_trade_dates", return_value=[trade_date]
+                ),
+                mock.patch.object(
+                    sentiment_service, "calculate_local_sentiment_batch", return_value={}
+                ) as batch,
+                mock.patch.object(
+                    sentiment_service.kaipanla_client, "is_configured", return_value=True
+                ),
+                mock.patch.object(
+                    sentiment_service, "_sync_external", side_effect=complete_external
+                ) as external,
+                mock.patch.object(sentiment_service, "_auto_mark_three_board_origins"),
+            ):
+                result = sentiment_service.sync_latest(session)
+
+            batch.assert_called_once_with(settings.cache_dir, [])
+            external.assert_called_once()
+            self.assertEqual(result["synced_dates"], [trade_date])
+            self.assertEqual(result["network_requests"], 3)
+            self.assertEqual(result["external_statuses"], {trade_date: "complete"})
 
 
 if __name__ == "__main__":

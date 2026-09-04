@@ -7,7 +7,9 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import httpx
 
@@ -31,6 +33,7 @@ class EndpointRequest:
 
 
 _LIVE_URL = "https://apphwhq.longhuvip.com/w1/api/index.php"
+_LIVE_RANKING_URL = "https://apphq.longhuvip.com/w1/api/index.php"
 _HISTORY_URL = "https://apphis.longhuvip.com/w1/api/index.php"
 
 
@@ -55,6 +58,7 @@ def _base_body() -> dict[str, str]:
 
 def build_request(endpoint: str, trade_date: str) -> EndpointRequest:
     if endpoint in {"sector_strength", "sector_weakness"}:
+        is_current = trade_date == datetime.now(ZoneInfo("Asia/Shanghai")).strftime("%Y-%m-%d")
         body = {
             "Order": "1" if endpoint == "sector_strength" else "0",
             "a": "RealRankingInfo",
@@ -69,6 +73,11 @@ def build_request(endpoint: str, trade_date: str) -> EndpointRequest:
             "Type": "1",
             "ZSType": "7",
         }
+        if is_current:
+            body.pop("Date")
+            body["apiv"] = "w21"
+            body["IsZZ"] = "0"
+            return EndpointRequest(endpoint, _LIVE_RANKING_URL, body)
         return EndpointRequest(endpoint, _HISTORY_URL, body)
 
     body = _base_body()
@@ -151,3 +160,15 @@ def payload_has_data(payload: Any) -> bool:
                 return True
         return False
     return bool(payload)
+
+
+def payload_error(payload: Any) -> str:
+    """提取 HTTP 200 响应中的业务错误，避免将参数错误误判为空数据。"""
+    if not isinstance(payload, dict):
+        return ""
+    code = payload.get("errcode")
+    if code not in (None, "", 0, "0"):
+        message = payload.get("errmsg") or payload.get("message") or "接口业务错误"
+        return f"errcode={code}: {message}"
+    error = payload.get("error")
+    return str(error).strip() if error else ""

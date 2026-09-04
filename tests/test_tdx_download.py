@@ -4,7 +4,7 @@ import tempfile
 import unittest
 import zipfile
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from backend.app.services import tdx_download_service as service
 
@@ -51,6 +51,41 @@ class TdxDownloadServiceTests(unittest.TestCase):
         self.assertFalse((self.raw_dir / "bj/lday/bj920001.day").exists())
         self.assertEqual(service._status.extracted, 2)
 
+    def test_remote_info_bypasses_cdn_cache_and_reads_zip_validators(self) -> None:
+        info_response = Mock(
+            text=(
+                'window.HSJDAY_SOFT_SIZE="522.56MB"; '
+                'window.HSJDAY_SOFT_TIME="2026-09-02 15:58:51";'
+            )
+        )
+        zip_response = Mock()
+        zip_response.headers = {
+            "ETag": '"new-etag"',
+            "Last-Modified": "Wed, 02 Sep 2026 07:58:51 GMT",
+            "Content-Length": "547952185",
+        }
+        client = Mock()
+        client.get.return_value = info_response
+        client.head.return_value = zip_response
+
+        with patch.object(service.httpx, "Client") as client_factory:
+            client_factory.return_value.__enter__.return_value = client
+            result = service.fetch_remote_info()
+
+        client_factory.assert_called_once()
+        headers = client_factory.call_args.kwargs["headers"]
+        self.assertEqual(headers["Cache-Control"], "no-cache")
+        self.assertEqual(headers["Pragma"], "no-cache")
+        get_params = client.get.call_args.kwargs["params"]
+        head_params = client.head.call_args.kwargs["params"]
+        self.assertTrue(get_params["_"])
+        self.assertEqual(head_params, get_params)
+        self.assertEqual(result["update_time"], "2026-09-02 15:58:51")
+        self.assertEqual(result["zip_etag"], '"new-etag"')
+        self.assertEqual(
+            result["zip_last_modified"], "Wed, 02 Sep 2026 07:58:51 GMT"
+        )
+
     def test_unchanged_remote_version_reuses_local_zip(self) -> None:
         self._make_zip()
         service._write_manifest({"remote_time": "2026-08-26 15:58:48"})
@@ -75,6 +110,34 @@ class TdxDownloadServiceTests(unittest.TestCase):
         build.assert_called_once_with()
         self.assertEqual(service._status.stage, "done")
         self.assertFalse(service._status.downloaded)
+
+    def test_changed_zip_validator_downloads_even_if_version_js_is_stale(self) -> None:
+        self._make_zip()
+        service._write_manifest(
+            {
+                "remote_time": "2026-09-01 15:58:58",
+                "zip_etag": '"old-etag"',
+            }
+        )
+        remote = {
+            "url": service.TDX_ZIP_URL,
+            "size": "522.39MB",
+            "update_time": "2026-09-01 15:58:58",
+            "zip_etag": '"new-etag"',
+        }
+
+        with (
+            patch.object(service, "fetch_remote_info", return_value=remote),
+            patch.object(service, "_download_zip") as download,
+            patch.object(service, "_extract_zip") as extract,
+            patch.object(service, "_sync_gbbq", return_value={}),
+            patch.object(service, "_run_incremental_build"),
+        ):
+            service._run_sync(force_download=False)
+
+        download.assert_called_once_with()
+        extract.assert_called_once_with(self.zip_path)
+        self.assertTrue(service._status.downloaded)
 
     def test_status_read_does_not_request_network(self) -> None:
         with patch.object(service, "fetch_remote_info", side_effect=AssertionError("network called")):

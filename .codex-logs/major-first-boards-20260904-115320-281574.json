@@ -1,0 +1,3543 @@
+{
+  "add": 79,
+  "remove": 363,
+  "changes": [
+    {
+      "id": "2a1d1330-036f-43cc-8eff-e6790d7dabb2",
+      "trade_date": "2026-07-17",
+      "code": "SH600644",
+      "name": "乐山电力",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5f9ef1cf-cfa3-4e86-8352-552fcaed3164",
+      "trade_date": "2026-07-17",
+      "code": "SH600722",
+      "name": "金牛化工",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "e9081235-61b2-4789-b9a1-40dd80a071ee",
+      "trade_date": "2026-07-17",
+      "code": "SH603118",
+      "name": "共进股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "1eee7d72-ef1a-486c-b0f8-a4298f1072ec",
+      "trade_date": "2026-07-20",
+      "code": "SH600396",
+      "name": "华电辽能",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "e694fe6c-7bc7-438c-8c8b-b4bbcc8de268",
+      "trade_date": "2026-07-20",
+      "code": "SH603619",
+      "name": "中曼石油",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "a93dedbd-706f-4573-b25f-adf585338235",
+      "trade_date": "2026-07-21",
+      "code": "SZ301583",
+      "name": "托伦斯",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ee8181d1-ff2a-49f7-adc5-18400dbeb43e",
+      "trade_date": "2026-07-22",
+      "code": "SH603580",
+      "name": "艾艾精工",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "510447cb-d3a1-42ca-a2be-589a812e3b12",
+      "trade_date": "2026-07-22",
+      "code": "SH603988",
+      "name": "中电电机",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "19f00e49-3f2a-4838-b6fa-e11720baf174",
+      "trade_date": "2026-07-22",
+      "code": "SH605162",
+      "name": "新中港",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5632451c-4e4f-4419-afb0-5912fba44ca4",
+      "trade_date": "2026-07-22",
+      "code": "SZ002900",
+      "name": "哈三联",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d9a429aa-3a50-4639-989c-91a0895ccce0",
+      "trade_date": "2026-07-23",
+      "code": "SH603400",
+      "name": "华之杰",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8c32f74a-8b3f-4975-81c1-da94ccdb2283",
+      "trade_date": "2026-07-23",
+      "code": "SZ000668",
+      "name": "荣丰控股",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "fce1a7f4-3f8e-4796-b5dc-8eb0b5fdfcd0",
+      "trade_date": "2026-07-23",
+      "code": "SZ002173",
+      "name": "创新医疗",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "66de9f8e-3f59-4cd2-8f14-4bbe5d52ff77",
+      "trade_date": "2026-07-23",
+      "code": "SZ002199",
+      "name": "东晶电子",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5e20c5df-9bd4-45c5-a4d5-726d9ad9386d",
+      "trade_date": "2026-07-23",
+      "code": "SZ002298",
+      "name": "中电鑫龙",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "934a8e98-a979-4c6f-baff-cd22885a84ad",
+      "trade_date": "2026-07-23",
+      "code": "SZ002498",
+      "name": "汉缆股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "cf33b549-c7a4-4480-827a-f877f39eb3bd",
+      "trade_date": "2026-07-23",
+      "code": "SZ002514",
+      "name": "*ST宝馨",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "33c91737-2543-4c38-8152-09b5227ee77b",
+      "trade_date": "2026-07-27",
+      "code": "SZ000566",
+      "name": "海南海药",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "9550e7a2-603b-490f-8572-73dd4f9605cd",
+      "trade_date": "2026-07-28",
+      "code": "SZ301139",
+      "name": "*ST元道",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b23c70bc-3215-4bb4-b98b-38a78d67c063",
+      "trade_date": "2026-07-29",
+      "code": "SH601858",
+      "name": "中国科传",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d52f7827-1def-4e14-8a6d-f01b9a9255b9",
+      "trade_date": "2026-07-29",
+      "code": "SZ000892",
+      "name": "欢瑞世纪",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "45f1c9d5-196c-4629-afd6-a2a23bf6c6a3",
+      "trade_date": "2026-07-29",
+      "code": "SZ003001",
+      "name": "中岩大地",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ffd6359f-0c06-4fe2-8a75-ecc5e056c69b",
+      "trade_date": "2026-07-31",
+      "code": "SH603115",
+      "name": "海星股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "eca7be8d-a1c6-47a5-8d75-7e928288f2d2",
+      "trade_date": "2026-07-31",
+      "code": "SH603629",
+      "name": "利通电子",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "2867f059-fe9f-4a08-b487-e580c35032e7",
+      "trade_date": "2026-07-31",
+      "code": "SH603738",
+      "name": "泰晶科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "2f4f1011-fc09-4765-9fc9-117a5848efdf",
+      "trade_date": "2026-07-31",
+      "code": "SH605287",
+      "name": "德才股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "6d4cdda5-59da-4267-ad28-eed5bc5709a1",
+      "trade_date": "2026-07-31",
+      "code": "SZ001267",
+      "name": "汇绿生态",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b5afab30-5e74-42e5-9c58-ffd0ffee92b0",
+      "trade_date": "2026-07-31",
+      "code": "SZ002552",
+      "name": "宝鼎科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "6040b0b2-776e-4a26-9404-9bdc89136001",
+      "trade_date": "2026-07-31",
+      "code": "SZ002957",
+      "name": "科瑞技术",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "7a9563ad-e169-4383-90dd-04f16e6114d1",
+      "trade_date": "2026-07-31",
+      "code": "SZ003018",
+      "name": "金富科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d844ab31-ae23-40f3-bf12-8cf7136546df",
+      "trade_date": "2026-07-31",
+      "code": "SZ003036",
+      "name": "泰坦股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "65e99959-96c0-40a4-a489-dd51fb0638f0",
+      "trade_date": "2026-08-03",
+      "code": "SH603823",
+      "name": "百合花",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ce69f730-356d-4e8c-b6f4-c5803e214a0a",
+      "trade_date": "2026-08-03",
+      "code": "SZ002792",
+      "name": "通宇通讯",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "0dd7a24c-c03e-4eda-943d-ec6451bb5571",
+      "trade_date": "2026-08-04",
+      "code": "SZ001267",
+      "name": "汇绿生态",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "360cc161-136d-4e68-be7d-e1c65803fb46",
+      "trade_date": "2026-08-04",
+      "code": "SZ002552",
+      "name": "宝鼎科技",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "43bce4ae-a0a1-4cfc-b105-b6d67d502988",
+      "trade_date": "2026-08-04",
+      "code": "SH601208",
+      "name": "东材科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "fdebb238-5831-4f55-abee-f16641ca650b",
+      "trade_date": "2026-08-04",
+      "code": "SH603186",
+      "name": "华正新材",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "2163b7ac-fd72-4728-ab15-98efbaf0b075",
+      "trade_date": "2026-08-06",
+      "code": "SZ002827",
+      "name": "高争民爆",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "b30219d3-9f79-4153-a4bf-78089545cdec",
+      "trade_date": "2026-08-06",
+      "code": "SZ002194",
+      "name": "武汉凡谷",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8018b3c5-a8a0-4a6c-83c6-afac0ccc2ec5",
+      "trade_date": "2026-08-07",
+      "code": "SH600641",
+      "name": "先导基电",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5e4a8097-dca0-4f32-a322-241aee23c624",
+      "trade_date": "2026-08-07",
+      "code": "SZ002437",
+      "name": "誉衡药业",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "38774739-abca-4650-bf09-8670faece7ae",
+      "trade_date": "2026-08-07",
+      "code": "SZ002589",
+      "name": "瑞康医药",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "dae8a9d1-bd87-4b80-8c18-dda065886e96",
+      "trade_date": "2026-08-10",
+      "code": "SH601886",
+      "name": "江河集团",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "fdf36c6a-e116-485e-8235-5b56dda8aebb",
+      "trade_date": "2026-08-12",
+      "code": "SH600491",
+      "name": "ST龙元",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b8f18604-11dd-42f5-ba67-6f2fd41a695a",
+      "trade_date": "2026-08-12",
+      "code": "SH603095",
+      "name": "越剑智能",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "9c1c2a7f-3aa0-4434-b8f9-2efb40e40b14",
+      "trade_date": "2026-08-13",
+      "code": "SZ002581",
+      "name": "*ST未名",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "35c6332f-b4b0-48c6-80cc-2cf968a80956",
+      "trade_date": "2026-08-17",
+      "code": "SH603580",
+      "name": "艾艾精工",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "77828195-95e3-46ed-b9ee-23d1e448c2d6",
+      "trade_date": "2026-08-17",
+      "code": "SH603958",
+      "name": "哈森股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5c4878fb-4b0a-4cbb-a2cc-2759eca5cfd6",
+      "trade_date": "2026-08-20",
+      "code": "SH603958",
+      "name": "哈森股份",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "e61b8215-0e66-4ca1-a826-ac03fbac8e7d",
+      "trade_date": "2026-08-21",
+      "code": "SH601212",
+      "name": "白银有色",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b4575733-d80c-4636-bf4f-fd4734346808",
+      "trade_date": "2026-08-25",
+      "code": "SH600127",
+      "name": "金健米业",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c9f509f7-4740-4724-ad6c-b9731f4e7149",
+      "trade_date": "2026-08-25",
+      "code": "SZ000560",
+      "name": "我爱我家",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "4aafe816-c5b9-4b52-8cb1-c86d72da71d1",
+      "trade_date": "2026-08-25",
+      "code": "SZ002949",
+      "name": "华阳国际",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b8f661c2-8be3-4688-9874-4e5dc3467ebf",
+      "trade_date": "2026-08-26",
+      "code": "SH600227",
+      "name": "赤天化",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "7d0b34c0-8399-4b6b-806c-9a4e5419fbb5",
+      "trade_date": "2026-07-15",
+      "code": "SZ000676",
+      "name": "智度股份",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "f0f68f1d-2b33-48bf-a25d-34bbec4b040c",
+      "trade_date": "2026-07-15",
+      "code": "SH600162",
+      "name": "香江控股",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "334ac874-3f4c-489e-87b4-69b22a651653",
+      "trade_date": "2025-12-02",
+      "code": "SH603122",
+      "name": "合富中国",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "63406be0-6dfd-4afd-81a4-179549f44dfc",
+      "trade_date": "2025-12-03",
+      "code": "SH600151",
+      "name": "航天机电",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "1f699636-5d4b-4d72-9445-c9202c4f8c09",
+      "trade_date": "2025-12-04",
+      "code": "SZ002512",
+      "name": "达华智能",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c2797233-7cbd-4a2f-b664-21a05b1ce1c7",
+      "trade_date": "2025-12-04",
+      "code": "SH603709",
+      "name": "中源家居",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c49a3574-3029-4ef4-b835-4c1771e60a2c",
+      "trade_date": "2025-12-05",
+      "code": "SZ002149",
+      "name": "西部材料",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "dfc18ef0-9d4b-4374-9f43-5c415e278bc7",
+      "trade_date": "2025-12-05",
+      "code": "SZ002969",
+      "name": "嘉美包装",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "48a81600-0561-4e00-8701-5ad57a82bca4",
+      "trade_date": "2025-12-05",
+      "code": "SZ001360",
+      "name": "南矿集团",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c1430889-682c-4ccb-8ee4-7cbc2a440629",
+      "trade_date": "2025-12-05",
+      "code": "SZ001270",
+      "name": "*ST铖昌",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "a9baa807-ef50-4e42-8b95-44a528bbf519",
+      "trade_date": "2025-12-05",
+      "code": "SH600343",
+      "name": "航天动力",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "21ef5109-7141-4781-86ac-c9a95b29b569",
+      "trade_date": "2025-12-08",
+      "code": "SZ002235",
+      "name": "安妮股份",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "09fafee9-8edc-4645-b2fd-ae4b666cb6ba",
+      "trade_date": "2025-12-08",
+      "code": "SH600250",
+      "name": "南京商旅",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "7e1c3ea8-2b09-41db-9158-08838202b0da",
+      "trade_date": "2025-12-10",
+      "code": "SZ001270",
+      "name": "*ST铖昌",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "84e97aa4-6b8c-4bc5-8460-1f90323e3951",
+      "trade_date": "2025-12-10",
+      "code": "SH603709",
+      "name": "中源家居",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "e18eb5fd-553a-4738-b1ed-612c8f9ebded",
+      "trade_date": "2025-12-10",
+      "code": "SZ000950",
+      "name": "重药控股",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b61a841d-2e5a-434a-8cd3-2157a109e612",
+      "trade_date": "2025-12-12",
+      "code": "SH601566",
+      "name": "九牧王",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "93ad7272-89c4-4a51-be21-a7f397719c90",
+      "trade_date": "2025-12-15",
+      "code": "SZ002329",
+      "name": "皇氏集团",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "f05f3995-ad97-4667-947f-764975322449",
+      "trade_date": "2025-12-16",
+      "code": "SH603023",
+      "name": "威帝股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "fc7f1231-693d-4f36-8767-661d35df6104",
+      "trade_date": "2025-12-17",
+      "code": "SZ002969",
+      "name": "嘉美包装",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "20ce7966-abae-4790-af8b-d81ccf3ad8ed",
+      "trade_date": "2025-12-17",
+      "code": "SH601869",
+      "name": "长飞光纤",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "19de802e-d7e8-4d2d-bae7-0df95cfad6bc",
+      "trade_date": "2025-12-18",
+      "code": "SH600599",
+      "name": "*ST熊猫",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "57b10ed8-6f76-426c-aed4-c1d63623c5e1",
+      "trade_date": "2025-12-19",
+      "code": "SZ002046",
+      "name": "国机精工",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "fd01d4fd-2304-4614-b9d7-e0d309061da0",
+      "trade_date": "2025-12-19",
+      "code": "SH603698",
+      "name": "航天工程",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "76439cca-28cd-4ac5-9b4a-e093a4b65997",
+      "trade_date": "2025-12-19",
+      "code": "SH603608",
+      "name": "天创时尚",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b5577577-1c5c-4f0f-97b2-67798315a95e",
+      "trade_date": "2025-12-19",
+      "code": "SZ000036",
+      "name": "华联控股",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b96cc049-8a56-43b1-936c-edfca0499ebc",
+      "trade_date": "2025-12-19",
+      "code": "SH600330",
+      "name": "天通股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "0495af10-a242-436c-9813-c2546cbdaf8e",
+      "trade_date": "2025-12-22",
+      "code": "SZ002951",
+      "name": "金时科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "50607ab1-1322-4183-96fe-dd2c75e6ac71",
+      "trade_date": "2025-12-22",
+      "code": "SZ002569",
+      "name": "*ST步森",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "fe7d675f-9286-4452-9e88-b3a1f70643c3",
+      "trade_date": "2025-12-22",
+      "code": "SH600376",
+      "name": "首开股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8c4aacb3-51f0-4421-abbb-4dd8cfc4413c",
+      "trade_date": "2025-12-22",
+      "code": "SZ002792",
+      "name": "通宇通讯",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "834687ab-b887-4ffe-8c9f-d3bd1fa816b4",
+      "trade_date": "2025-12-22",
+      "code": "SH603843",
+      "name": "*ST正平",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "3b4bb30d-cbe4-495c-97f6-e0344305b58b",
+      "trade_date": "2025-12-23",
+      "code": "SH603698",
+      "name": "航天工程",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "76e3c441-c01b-4c7e-8edd-6db9c6269458",
+      "trade_date": "2025-12-23",
+      "code": "SZ002759",
+      "name": "天际股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "a023784e-b116-431a-ab02-8bfeb25b51ad",
+      "trade_date": "2025-12-24",
+      "code": "SZ002592",
+      "name": "ST八菱",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "967abe9d-bf6e-41b6-a503-889a35529624",
+      "trade_date": "2025-12-24",
+      "code": "SZ002471",
+      "name": "中超控股",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "16b28a6f-6cdc-48ed-956f-fe2362c58af9",
+      "trade_date": "2025-12-24",
+      "code": "SH605069",
+      "name": "正和生态",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "91fee37d-e9be-4c21-ac05-82fb3984aa13",
+      "trade_date": "2025-12-25",
+      "code": "SH603843",
+      "name": "*ST正平",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "8ac231dd-a88b-45c0-bcd4-1cbaa0cae9bc",
+      "trade_date": "2025-12-25",
+      "code": "SZ002713",
+      "name": "*ST东易",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5b442387-adc6-4e09-be69-445b6eddd246",
+      "trade_date": "2025-12-25",
+      "code": "SH605255",
+      "name": "天普股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b9f762bb-2925-428d-b401-195064dfaf5f",
+      "trade_date": "2025-12-26",
+      "code": "SZ000547",
+      "name": "航天发展",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "3f404c51-a269-42d1-b870-14a9bf7f1342",
+      "trade_date": "2025-12-26",
+      "code": "SZ002571",
+      "name": "德力股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "36e87da4-1026-4057-80a2-ce53a4192d32",
+      "trade_date": "2025-12-26",
+      "code": "SZ002151",
+      "name": "北斗星通",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8c49fd0f-25f2-44aa-b962-d4884286b558",
+      "trade_date": "2025-12-26",
+      "code": "SH601698",
+      "name": "中国卫通",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "05c1e82f-1400-42c6-b5f9-65d47ca16df6",
+      "trade_date": "2025-12-29",
+      "code": "SZ002465",
+      "name": "海格通信",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "1e615c0a-73c0-4a8e-b05d-6d653bf16bce",
+      "trade_date": "2025-12-29",
+      "code": "SH603828",
+      "name": "ST柯利达",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "94668f90-965c-4af9-8a8b-ce5acab95a5b",
+      "trade_date": "2025-12-29",
+      "code": "SH603458",
+      "name": "勘设股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5910f583-c459-475f-94b9-09712b75e49c",
+      "trade_date": "2025-12-29",
+      "code": "SH603778",
+      "name": "国晟科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8673ac08-c670-4364-98d1-e8881c5ee399",
+      "trade_date": "2025-12-31",
+      "code": "SZ001270",
+      "name": "*ST铖昌",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "8c96a228-0a9b-49b4-9779-3f66241c0fbf",
+      "trade_date": "2025-12-31",
+      "code": "SZ002713",
+      "name": "*ST东易",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "87e3fa72-0378-405a-8801-2cb7f10c2449",
+      "trade_date": "2025-12-31",
+      "code": "SZ002151",
+      "name": "北斗星通",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "e0b6d0b3-6c70-41a0-95f1-ffb8f61073f2",
+      "trade_date": "2025-12-31",
+      "code": "SH601698",
+      "name": "中国卫通",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "0e94140d-40e8-4b33-b917-1d292a58c515",
+      "trade_date": "2025-12-31",
+      "code": "SH600135",
+      "name": "乐凯胶片",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "1cd5d73a-b40c-4396-83a0-3b4a7fc476ae",
+      "trade_date": "2025-12-31",
+      "code": "SH600879",
+      "name": "航天电子",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "367b0505-c8be-4560-9b60-a6b8727caf08",
+      "trade_date": "2025-12-31",
+      "code": "SZ002496",
+      "name": "*ST辉丰",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "02da4e2e-5f3a-4206-b898-000e486f95f8",
+      "trade_date": "2026-01-05",
+      "code": "SZ002592",
+      "name": "ST八菱",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "03006a38-296c-4da0-a29c-3541b9a64189",
+      "trade_date": "2026-01-05",
+      "code": "SH603778",
+      "name": "国晟科技",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "d45659ab-580b-49b5-9d49-4a34426788b2",
+      "trade_date": "2026-01-05",
+      "code": "SZ000691",
+      "name": "*ST亚太",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ffb9ac96-0137-4995-b6f4-592a75099700",
+      "trade_date": "2026-01-05",
+      "code": "SH603716",
+      "name": "塞力医疗",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "1840bd4b-f1a6-4ab2-a4b8-f5915cb4401d",
+      "trade_date": "2026-01-05",
+      "code": "SZ300753",
+      "name": "爱朋医疗",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d5b7f7a2-b8d6-4238-8c8f-ce3b70ee2848",
+      "trade_date": "2026-01-05",
+      "code": "SZ300887",
+      "name": "谱尼测试",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "855a9358-97b9-4e70-adde-9e1b50cd4fa6",
+      "trade_date": "2026-01-06",
+      "code": "SH600783",
+      "name": "鲁信创投",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "aa213337-ba49-4c73-873c-42b4241e78a1",
+      "trade_date": "2026-01-06",
+      "code": "SZ002865",
+      "name": "钧达股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "95501444-a494-4c10-bc2e-8ab8eda14649",
+      "trade_date": "2026-01-07",
+      "code": "SZ002792",
+      "name": "通宇通讯",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "af92fb4a-563c-47e6-8dbf-472e1609e1c9",
+      "trade_date": "2026-01-07",
+      "code": "SH601611",
+      "name": "中国核建",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "31ae8866-564d-4894-b114-0c748173e8b8",
+      "trade_date": "2026-01-07",
+      "code": "SZ000908",
+      "name": "*ST景峰",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "79571e8f-566c-4624-8d59-8684f2e0abae",
+      "trade_date": "2026-01-07",
+      "code": "SZ301079",
+      "name": "邵阳液压",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "2079198a-710a-43ae-8f04-d12683b7ecaf",
+      "trade_date": "2026-01-07",
+      "code": "SZ002639",
+      "name": "雪人集团",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "859c0cdd-2586-432a-b17a-eae675bd396c",
+      "trade_date": "2026-01-07",
+      "code": "SH603488",
+      "name": "展鹏科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "328b6f35-c501-4213-95d7-ab1d815b4f61",
+      "trade_date": "2026-01-08",
+      "code": "SH600879",
+      "name": "航天电子",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "fc61fe06-9681-4501-8928-bd016dea3591",
+      "trade_date": "2026-01-08",
+      "code": "SZ002647",
+      "name": "*ST仁东",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "205063df-a498-4855-9373-f30b86ce3a26",
+      "trade_date": "2026-01-09",
+      "code": "SH603598",
+      "name": "引力传媒",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "120a47d9-e594-44fa-be16-fe9070e71fbb",
+      "trade_date": "2026-01-09",
+      "code": "SZ002848",
+      "name": "*ST高斯",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "793b09c4-dae5-492c-8d1d-a63b2bf7a7c4",
+      "trade_date": "2026-01-09",
+      "code": "SH600986",
+      "name": "浙文互联",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "3a568cd6-0b10-478d-b119-fae48ea4b83d",
+      "trade_date": "2026-01-09",
+      "code": "SZ002181",
+      "name": "粤传媒",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "873c9913-56d1-4d2c-a844-eb6b3410fd8b",
+      "trade_date": "2026-01-09",
+      "code": "SH603179",
+      "name": "新泉股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "67ebcee6-93af-461a-b096-c6583c90e5c8",
+      "trade_date": "2026-01-09",
+      "code": "SH600556",
+      "name": "天下秀",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c41c50f2-0146-430e-a50e-50ee5db156fc",
+      "trade_date": "2026-01-12",
+      "code": "SZ002718",
+      "name": "友邦吊顶",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "b638a23d-c5d2-4568-921d-1004158db949",
+      "trade_date": "2026-01-12",
+      "code": "SH603828",
+      "name": "ST柯利达",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "f8e42223-f6f7-4ae7-b95c-87dd74188316",
+      "trade_date": "2026-01-12",
+      "code": "SZ000681",
+      "name": "视觉中国",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "25db3e26-1f74-479b-8f5c-bd0aff163b5a",
+      "trade_date": "2026-01-12",
+      "code": "SZ301378",
+      "name": "通达海",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "efc737a3-693a-4c2e-96c0-959ba8f28ed4",
+      "trade_date": "2026-01-12",
+      "code": "SZ002446",
+      "name": "盛路通信",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ad7471d5-2f4d-4f51-a4f4-3b1974127d01",
+      "trade_date": "2026-01-15",
+      "code": "SZ002546",
+      "name": "新联电子",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "08cd062d-1178-4180-b9c1-cbbda77fffc1",
+      "trade_date": "2026-01-15",
+      "code": "SZ001337",
+      "name": "四川黄金",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8e87ce08-6048-46a4-9761-cf0821704b62",
+      "trade_date": "2026-01-15",
+      "code": "SZ002636",
+      "name": "金安国纪",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "3e607451-0792-4c62-8047-94a340f0e435",
+      "trade_date": "2026-01-19",
+      "code": "SZ002969",
+      "name": "嘉美包装",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "a166d757-2859-41cc-9fc3-1696590997be",
+      "trade_date": "2026-01-19",
+      "code": "SZ002201",
+      "name": "九鼎新材",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c9d3cb41-67f4-40fa-ab7f-c8b09b4419da",
+      "trade_date": "2026-01-19",
+      "code": "SZ002995",
+      "name": "天地在线",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "624e5617-7f7c-44cc-9f74-b791900be609",
+      "trade_date": "2026-01-19",
+      "code": "SH600391",
+      "name": "航发科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "e6c022e1-58c8-416e-82d0-26daeb2cde0e",
+      "trade_date": "2026-01-19",
+      "code": "SZ002592",
+      "name": "ST八菱",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "7d616b9e-89e1-4643-8153-4b2ae3a627c6",
+      "trade_date": "2026-01-19",
+      "code": "SZ002689",
+      "name": "ST远智",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "40bb5684-15dc-454f-9ff0-d5e8e9488266",
+      "trade_date": "2026-01-19",
+      "code": "SH600774",
+      "name": "汉商集团",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "a4782a4f-9529-47bb-adce-fb529b009140",
+      "trade_date": "2026-01-20",
+      "code": "SH600986",
+      "name": "浙文互联",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "9046e4f9-7a48-4953-9ea6-78f84a234d9d",
+      "trade_date": "2026-01-20",
+      "code": "SZ002165",
+      "name": "红宝丽",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d253cb3a-0e1f-4504-ad2b-dc9f52510f61",
+      "trade_date": "2026-01-21",
+      "code": "SH600759",
+      "name": "洲际油气",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "4fa15925-fe37-4a27-9545-7f622eeb4e8c",
+      "trade_date": "2026-01-21",
+      "code": "SH601069",
+      "name": "西部黄金",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "800de681-d50a-421f-826d-72d8fc972e65",
+      "trade_date": "2026-01-22",
+      "code": "SZ002943",
+      "name": "宇晶股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "0ee31394-113f-415d-a086-e5b6d3dba3b3",
+      "trade_date": "2026-01-23",
+      "code": "SZ000751",
+      "name": "锌业股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "f6281e37-c9cf-4a52-b1ae-6ad3b7330689",
+      "trade_date": "2026-01-23",
+      "code": "SZ000630",
+      "name": "铜陵有色",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "efb4100c-b4b2-4f0a-80af-919fdafe0d5f",
+      "trade_date": "2026-01-23",
+      "code": "SZ000603",
+      "name": "盛达资源",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "492733ec-a762-4775-b70e-77252f8a791f",
+      "trade_date": "2026-01-23",
+      "code": "SZ002667",
+      "name": "威领股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d352d59d-aa87-402d-990f-f74748915c44",
+      "trade_date": "2026-01-23",
+      "code": "SZ001337",
+      "name": "四川黄金",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "ec4b6342-fa3b-43c5-aef5-b88e55057b28",
+      "trade_date": "2026-01-26",
+      "code": "SZ000506",
+      "name": "招金黄金",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "54d27f55-436a-436e-b7e7-3a4f7a9e302b",
+      "trade_date": "2026-01-26",
+      "code": "SH603958",
+      "name": "哈森股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5a653de7-a6e5-4320-b346-383518d46c03",
+      "trade_date": "2026-01-26",
+      "code": "SZ000711",
+      "name": "ST京蓝",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ce42de85-affc-4bb4-b76b-b5214bbfdda3",
+      "trade_date": "2026-01-26",
+      "code": "SH603619",
+      "name": "中曼石油",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8cc06148-4707-4105-9208-32c0b6376733",
+      "trade_date": "2026-01-27",
+      "code": "SZ300344",
+      "name": "*ST立方",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ddb0dc68-2fd6-4991-80af-b15b7cd3a842",
+      "trade_date": "2026-01-29",
+      "code": "SZ300344",
+      "name": "*ST立方",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "706f21ca-cbbe-456b-9686-7f458ddb3cae",
+      "trade_date": "2026-01-29",
+      "code": "SH600785",
+      "name": "新华百货",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "a954b7c2-b215-4482-9919-e12b01e750ac",
+      "trade_date": "2026-01-29",
+      "code": "SH603980",
+      "name": "吉华集团",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "76a6b314-5109-4225-8e93-57d7c8c68e4f",
+      "trade_date": "2026-01-30",
+      "code": "SH600828",
+      "name": "茂业商业",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "13947487-e9d6-4344-a3e8-4c6561aa46ba",
+      "trade_date": "2026-01-30",
+      "code": "SH600330",
+      "name": "天通股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ce2ef6b5-2444-4aec-b2a5-b21ec775bfa3",
+      "trade_date": "2026-02-02",
+      "code": "SZ000711",
+      "name": "ST京蓝",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "c1fdb31f-cca5-4cb7-bc1d-4d0a51540d13",
+      "trade_date": "2026-02-02",
+      "code": "SH603843",
+      "name": "*ST正平",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "2dd4e611-1bbe-47e0-8f44-1980b31d03af",
+      "trade_date": "2026-02-02",
+      "code": "SZ002112",
+      "name": "三变科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "776a7cbb-cc01-49dc-849b-fe8e6e732b41",
+      "trade_date": "2026-02-03",
+      "code": "SZ002361",
+      "name": "神剑股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "6c0ecf90-7e7b-4257-aba6-872d3d3b606a",
+      "trade_date": "2026-02-04",
+      "code": "SZ002485",
+      "name": "ST雪发",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "62e083a3-25b5-401d-9e9c-ca8ecc778183",
+      "trade_date": "2026-02-05",
+      "code": "SZ000056",
+      "name": "皇庭国际",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "f368fa2e-54c8-4e94-a509-89e45f77be21",
+      "trade_date": "2026-02-06",
+      "code": "SZ002455",
+      "name": "百川股份",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "be145f6a-841c-4a7a-8acb-19f1336b5cfe",
+      "trade_date": "2026-02-06",
+      "code": "SH603138",
+      "name": "海量数据",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "07193373-b1cf-4e59-8c4b-be4e49dc3f2c",
+      "trade_date": "2026-02-06",
+      "code": "SH600722",
+      "name": "金牛化工",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "6fe155af-689e-4e99-88ca-5da833dc766c",
+      "trade_date": "2026-02-06",
+      "code": "SZ002842",
+      "name": "翔鹭钨业",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "af6fc167-0a29-49d9-8a2f-6500da2e2375",
+      "trade_date": "2026-02-09",
+      "code": "SH603980",
+      "name": "吉华集团",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "529e7f42-262f-426d-a24e-85cf7f6f8851",
+      "trade_date": "2026-02-09",
+      "code": "SZ002485",
+      "name": "ST雪发",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "24d7ece1-e7ac-47bb-bfdd-6942117e9ce9",
+      "trade_date": "2026-02-10",
+      "code": "SZ000839",
+      "name": "国安股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "409d5d7d-a402-44ed-8ab0-473cf488b9fd",
+      "trade_date": "2026-02-10",
+      "code": "SH603268",
+      "name": "*ST松发",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "faee2361-7bd4-464d-96c5-76a436fa82f2",
+      "trade_date": "2026-02-11",
+      "code": "SH605006",
+      "name": "山东玻纤",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b735a808-6f0d-4076-8677-9ec0773f2b87",
+      "trade_date": "2026-02-11",
+      "code": "SH600545",
+      "name": "卓郎智能",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8b6b1754-8ee1-48c6-ac64-fdd06c191681",
+      "trade_date": "2026-02-11",
+      "code": "SH603256",
+      "name": "宏和科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "9259bb20-8116-4383-86b0-e2db22695012",
+      "trade_date": "2026-02-11",
+      "code": "SH603601",
+      "name": "再升科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d3ac5b4c-70f0-4154-ac4a-5f5542e946b6",
+      "trade_date": "2026-02-11",
+      "code": "SZ002378",
+      "name": "章源钨业",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "07869f92-cb9e-441a-9aaf-c8cfcd75fb16",
+      "trade_date": "2026-02-11",
+      "code": "SH600397",
+      "name": "江钨装备",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "89c6b5fa-5f7d-40b7-aaca-58dcd05c46a5",
+      "trade_date": "2026-02-11",
+      "code": "SZ000962",
+      "name": "东方钽业",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c3f9cef6-063e-4737-8f27-30d453ad8d3c",
+      "trade_date": "2026-02-11",
+      "code": "SZ002470",
+      "name": "金正大",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "2d40d7b6-6ade-4c3f-9875-974d2a72fcad",
+      "trade_date": "2026-02-12",
+      "code": "SZ000711",
+      "name": "ST京蓝",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d2e47bee-fd64-42f6-acdd-d6d82e2f3d7b",
+      "trade_date": "2026-02-12",
+      "code": "SH601872",
+      "name": "招商轮船",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5896f579-801c-48d4-9fc5-753544c087a0",
+      "trade_date": "2026-02-13",
+      "code": "SH603021",
+      "name": "ST华鹏",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "2b2104d4-e76c-4771-9424-b39a1b7c5117",
+      "trade_date": "2026-02-13",
+      "code": "SZ002843",
+      "name": "泰嘉股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8bdbb656-3744-4cfc-8a68-3978013d3c6a",
+      "trade_date": "2026-02-24",
+      "code": "SZ002470",
+      "name": "金正大",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "4757fd54-9b7c-4497-83d3-5b36ca0cc801",
+      "trade_date": "2026-02-24",
+      "code": "SH600759",
+      "name": "洲际油气",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "6cd247a1-e05c-4fc4-9b99-f96d7eff1e19",
+      "trade_date": "2026-02-24",
+      "code": "SZ002047",
+      "name": "*ST宝鹰",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "cc36012f-4db2-47cf-a5f3-3ca231be32f2",
+      "trade_date": "2026-02-24",
+      "code": "SZ002491",
+      "name": "通鼎互联",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8211d5b2-2bf3-4bdd-b33b-f17cb82e3dd8",
+      "trade_date": "2026-02-25",
+      "code": "SH603268",
+      "name": "*ST松发",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "f1e45636-efa6-48c1-a060-ebe695f0deb4",
+      "trade_date": "2026-02-25",
+      "code": "SZ002378",
+      "name": "章源钨业",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "60303eaa-fc84-4244-8259-a8230aca6bf9",
+      "trade_date": "2026-02-25",
+      "code": "SH600525",
+      "name": "ST长园",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "41dfa998-4691-456b-bb77-33978cb64dec",
+      "trade_date": "2026-02-25",
+      "code": "SH600301",
+      "name": "华锡有色",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "6223719c-9711-45a8-9aee-918340f0c6f9",
+      "trade_date": "2026-02-25",
+      "code": "SH603580",
+      "name": "*ST艾艾",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "f6f02a48-1b7e-49da-96d1-2491ee9e4d3b",
+      "trade_date": "2026-02-26",
+      "code": "SZ002843",
+      "name": "泰嘉股份",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "41b5f304-120e-4c9b-9180-c66c43ff8b46",
+      "trade_date": "2026-02-26",
+      "code": "SZ002350",
+      "name": "北京科锐",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "cb1052f8-2178-48bc-9ab9-3ca2f032e00a",
+      "trade_date": "2026-02-26",
+      "code": "SH603530",
+      "name": "神马电力",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "4a6a2ce6-e299-45f0-bbe0-9d6d48accf6d",
+      "trade_date": "2026-02-27",
+      "code": "SZ000697",
+      "name": "ST炼石",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "e6716f6b-d411-4d95-b8e1-2ac52e48306e",
+      "trade_date": "2026-03-02",
+      "code": "SH600759",
+      "name": "洲际油气",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "f0abef83-08bd-4fc8-bc1a-193488a83868",
+      "trade_date": "2026-03-02",
+      "code": "SH600722",
+      "name": "金牛化工",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "cd488e77-2bb9-4405-917b-1dade9f416ff",
+      "trade_date": "2026-03-02",
+      "code": "SZ001267",
+      "name": "汇绿生态",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "542bc7db-1af7-49ad-9b52-d49831c10ca9",
+      "trade_date": "2026-03-03",
+      "code": "SH603778",
+      "name": "国晟科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "60a6ac16-7154-4ec4-8919-c11db2920f1e",
+      "trade_date": "2026-03-04",
+      "code": "SH600821",
+      "name": "金开新能",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "f0644450-fdf3-4ad8-b98f-ef1ef8213318",
+      "trade_date": "2026-03-05",
+      "code": "SZ000908",
+      "name": "*ST景峰",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d5b366cd-7b60-4f26-9cc5-64b5096241e1",
+      "trade_date": "2026-03-06",
+      "code": "SZ002528",
+      "name": "ST英飞拓",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "42264c25-ffd2-4d11-8cd3-ebdf7574f0b1",
+      "trade_date": "2026-03-06",
+      "code": "SZ002015",
+      "name": "协鑫能科",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "e451edef-c51d-408d-8553-399c02e4046f",
+      "trade_date": "2026-03-06",
+      "code": "SH601868",
+      "name": "中国能建",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d05256ca-1e9f-4a57-98a2-10b9432d1602",
+      "trade_date": "2026-03-06",
+      "code": "SZ000609",
+      "name": "ST中迪",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "132dc044-0171-4df8-8f8a-3ee9bd6f8d18",
+      "trade_date": "2026-03-10",
+      "code": "SH603803",
+      "name": "瑞斯康达",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "7c2ab1ca-ffe1-4402-ae7e-cb68d707ef59",
+      "trade_date": "2026-03-10",
+      "code": "SH603421",
+      "name": "鼎信通讯",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "31db2f71-9226-471a-a3a1-024e0f6458b9",
+      "trade_date": "2026-03-10",
+      "code": "SZ002789",
+      "name": "*ST建艺",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c0ec9270-7de5-4ab5-8ffe-1eeb32388564",
+      "trade_date": "2026-03-12",
+      "code": "SZ000908",
+      "name": "*ST景峰",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "fc736f37-cbd4-4149-8565-a71063712145",
+      "trade_date": "2026-03-12",
+      "code": "SH600691",
+      "name": "潞化科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "58069a55-6765-4189-ab94-6a55859ded7e",
+      "trade_date": "2026-03-13",
+      "code": "SZ002693",
+      "name": "*ST双成",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "93bf7ad1-aab8-4350-8a6b-b00860ab6d6d",
+      "trade_date": "2026-03-13",
+      "code": "SH600307",
+      "name": "酒钢宏兴",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ca0fa052-7168-4fcc-a3f8-059cc317f386",
+      "trade_date": "2026-03-13",
+      "code": "SZ002323",
+      "name": "雅博股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ca12dbe6-e28f-4991-bd8c-bb509b48b9b1",
+      "trade_date": "2026-03-16",
+      "code": "SZ002310",
+      "name": "东方新能",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c81fc4ad-ca74-4f15-9286-b57b10e8cd74",
+      "trade_date": "2026-03-17",
+      "code": "SH603398",
+      "name": "*ST沐邦",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "a8bfcf0b-d0a4-4b56-9f2c-efb50a02a7d5",
+      "trade_date": "2026-03-19",
+      "code": "SH603843",
+      "name": "*ST正平",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "a3bd12ca-9677-46d1-a86a-e8a56ae1f83c",
+      "trade_date": "2026-03-19",
+      "code": "SZ002310",
+      "name": "东方新能",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "d9aaf7d4-7ab9-4993-a306-1b7bd5efc05b",
+      "trade_date": "2026-03-19",
+      "code": "SH600726",
+      "name": "华电能源",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "2a383865-20fd-4689-8b7d-ae0d476f3ff9",
+      "trade_date": "2026-03-20",
+      "code": "SZ002428",
+      "name": "云南锗业",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "9062ad25-b263-49ea-9e54-414d5b979328",
+      "trade_date": "2026-03-20",
+      "code": "SH603538",
+      "name": "美诺华",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "3f82b598-160f-45a9-bcec-aee6ca6f8d48",
+      "trade_date": "2026-03-20",
+      "code": "SH605299",
+      "name": "舒华体育",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b5b51bbf-ad45-478b-8f89-0491576b151f",
+      "trade_date": "2026-03-23",
+      "code": "SH600136",
+      "name": "ST明诚",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "9441e4dd-b41f-4899-ae79-8fd3fe2c5783",
+      "trade_date": "2026-03-23",
+      "code": "SH600844",
+      "name": "金煤科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d406ea8d-039f-4121-a03b-c36d803fe19d",
+      "trade_date": "2026-03-23",
+      "code": "SH600107",
+      "name": "ST尔雅",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "731e8d2c-42ef-4662-b2e6-3e0a6d87ee21",
+      "trade_date": "2026-03-24",
+      "code": "SH603538",
+      "name": "美诺华",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "a483f3a8-5403-4e5c-a0b8-2f9c09e6c356",
+      "trade_date": "2026-03-24",
+      "code": "SH600539",
+      "name": "狮头股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5f622ce1-bf1b-424a-b775-9081e37dc054",
+      "trade_date": "2026-03-24",
+      "code": "SH600666",
+      "name": "奥瑞德",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c04ae06c-49f4-4043-91e9-a24c279060c3",
+      "trade_date": "2026-03-24",
+      "code": "SZ002082",
+      "name": "万邦德",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "93f41122-4d14-47c8-bf1e-db2132a5d716",
+      "trade_date": "2026-03-24",
+      "code": "SH600982",
+      "name": "宁波能源",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d100141b-9b7c-42b0-9137-84284c817ff7",
+      "trade_date": "2026-03-24",
+      "code": "SH601869",
+      "name": "长飞光纤",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "7c3a3558-e369-438a-a793-14a6c78dc983",
+      "trade_date": "2026-03-24",
+      "code": "SH603272",
+      "name": "*ST联翔",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "fe2ada8a-7aab-49ce-aa32-bef7f65c8e0b",
+      "trade_date": "2026-03-25",
+      "code": "SH603601",
+      "name": "再升科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "3506f40a-523b-4011-9964-219855233c3c",
+      "trade_date": "2026-03-25",
+      "code": "SH603618",
+      "name": "杭电股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "2c0a6fd8-c416-4ed9-90e7-bc32fe7c2971",
+      "trade_date": "2026-03-25",
+      "code": "SZ002038",
+      "name": "双鹭药业",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d1e5562c-9174-45f6-b044-98f35412c79e",
+      "trade_date": "2026-03-25",
+      "code": "SZ000592",
+      "name": "平潭发展",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b781b2d7-63ee-47f1-9a1f-e066acd1e1b1",
+      "trade_date": "2026-03-25",
+      "code": "SZ002713",
+      "name": "*ST东易",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ee9a625c-57ad-48fa-b3b0-ace72bb58152",
+      "trade_date": "2026-03-26",
+      "code": "SZ000908",
+      "name": "ST景峰",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "e015390a-fc17-48ef-9f6f-512951b4524f",
+      "trade_date": "2026-03-26",
+      "code": "SH603272",
+      "name": "联翔股份",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "41457257-5d75-4930-983c-f53eac5fdc75",
+      "trade_date": "2026-03-26",
+      "code": "SZ002263",
+      "name": "大东南",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "32a93385-b4a3-441f-9f3f-febe94c9f618",
+      "trade_date": "2026-03-27",
+      "code": "SZ002432",
+      "name": "九安医疗",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "fa1850ee-8f64-4629-b3d4-374637230711",
+      "trade_date": "2026-03-30",
+      "code": "SH603778",
+      "name": "国晟科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "377e4eb2-3699-4994-a9d1-c4fe2b948260",
+      "trade_date": "2026-03-31",
+      "code": "SZ002528",
+      "name": "ST英飞拓",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "9d2f6dc8-5494-400a-b06f-190b4fbc82f5",
+      "trade_date": "2026-04-01",
+      "code": "SH601133",
+      "name": "柏诚股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5f939f69-66f0-4ad2-b060-3467d0629ae6",
+      "trade_date": "2026-04-02",
+      "code": "SZ000720",
+      "name": "新能泰山",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "e04bbed2-a60a-46c6-9ae7-71f30b5dd9e4",
+      "trade_date": "2026-04-02",
+      "code": "SZ002051",
+      "name": "中工国际",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "3e5f8b4c-d1cf-466a-98c8-43512e7c0bfd",
+      "trade_date": "2026-04-07",
+      "code": "SZ002528",
+      "name": "ST英飞拓",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "08dc4ed8-bb14-48a6-b2df-ee2e2129fcea",
+      "trade_date": "2026-04-07",
+      "code": "SZ002650",
+      "name": "ST加加",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "9a9e5967-86bb-47f0-9aab-ab86f55d1475",
+      "trade_date": "2026-04-07",
+      "code": "SZ002957",
+      "name": "科瑞技术",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "0caa671c-9893-4e54-b008-ca966aed5e1c",
+      "trade_date": "2026-04-07",
+      "code": "SZ002713",
+      "name": "*ST东易",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "be175572-ea08-403f-b23f-34cd014fab99",
+      "trade_date": "2026-04-08",
+      "code": "SZ001270",
+      "name": "*ST铖昌",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "63f1bff9-3e05-4cab-a761-2da886aa979e",
+      "trade_date": "2026-04-08",
+      "code": "SZ002929",
+      "name": "润建股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "7029795e-1731-4fc5-88ff-50375d7c79c1",
+      "trade_date": "2026-04-09",
+      "code": "SZ002328",
+      "name": "新朋股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5b994c25-9ebb-49f7-88ad-db08b33c2d9f",
+      "trade_date": "2026-04-09",
+      "code": "SH603773",
+      "name": "沃格光电",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c5cd4b50-156f-4e85-9b9c-b5c6c8eededa",
+      "trade_date": "2026-04-09",
+      "code": "SZ002824",
+      "name": "和胜股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8ccaf5a3-9d64-4c92-bcda-bbe620496182",
+      "trade_date": "2026-04-10",
+      "code": "SH603021",
+      "name": "ST华鹏",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "e278cc23-411c-4b36-95e4-05e74afbd0b1",
+      "trade_date": "2026-04-13",
+      "code": "SZ001270",
+      "name": "*ST铖昌",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "23fdfebb-31c0-48b5-afb2-bf14375beed5",
+      "trade_date": "2026-04-13",
+      "code": "SH600152",
+      "name": "维科技术",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "da8b5e35-90ee-4b0d-8401-09a7a21d34f4",
+      "trade_date": "2026-04-13",
+      "code": "SZ000609",
+      "name": "ST中迪",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "a531d86a-6b7b-42de-86dc-bfb42a8d6b19",
+      "trade_date": "2026-04-14",
+      "code": "SZ002630",
+      "name": "ST华西",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "28bef918-d441-4f02-9bc1-2975cff4a571",
+      "trade_date": "2026-04-14",
+      "code": "SH603629",
+      "name": "利通电子",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ececcdd6-3220-44aa-8845-5dfdd9411e99",
+      "trade_date": "2026-04-14",
+      "code": "SZ000711",
+      "name": "ST京蓝",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "bc94b9f3-8b41-49c4-892b-f5cdd9b13b96",
+      "trade_date": "2026-04-15",
+      "code": "SZ002361",
+      "name": "神剑股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "49fd7d80-d00b-4747-99e8-dba402256d11",
+      "trade_date": "2026-04-15",
+      "code": "SH603268",
+      "name": "*ST松发",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "1d42600e-7eef-431f-bd70-69ecdfae6730",
+      "trade_date": "2026-04-17",
+      "code": "SH600330",
+      "name": "天通股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "3e576232-9322-4be2-b8ee-7f9be0aaac0c",
+      "trade_date": "2026-04-17",
+      "code": "SH600234",
+      "name": "科新发展",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "6261f18b-8bc7-4b88-b9c3-de41790c4ff2",
+      "trade_date": "2026-04-17",
+      "code": "SZ002428",
+      "name": "云南锗业",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "6c97af24-7163-4ba0-9edb-fda318f03c89",
+      "trade_date": "2026-04-17",
+      "code": "SZ002418",
+      "name": "康盛股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "340153d8-1a83-4991-bbc6-5219feb21726",
+      "trade_date": "2026-04-20",
+      "code": "SZ000609",
+      "name": "ST中迪",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "9d3dd778-e28b-48ab-9957-8aa45e44eebd",
+      "trade_date": "2026-04-20",
+      "code": "SH603017",
+      "name": "中衡设计",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "a6b9539e-5342-4ef8-8ea8-92eb35519a51",
+      "trade_date": "2026-04-20",
+      "code": "SH603318",
+      "name": "水发燃气",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "501b6b14-c5f2-4f6e-9bee-f75c7074a5f8",
+      "trade_date": "2026-04-22",
+      "code": "SH603318",
+      "name": "水发燃气",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "1ed1759a-88a9-475e-81f7-83f24b6b38f8",
+      "trade_date": "2026-04-22",
+      "code": "SZ000062",
+      "name": "深圳华强",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "4aca5d0a-f86b-41ee-810f-165dcc2db120",
+      "trade_date": "2026-04-23",
+      "code": "SH600770",
+      "name": "综艺股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "84c5fbce-e0ac-432e-be6e-c35f0dbf29a4",
+      "trade_date": "2026-04-23",
+      "code": "SZ000593",
+      "name": "德龙汇能",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d1d5994f-b2dc-47de-bf98-f7fea2e0e727",
+      "trade_date": "2026-04-24",
+      "code": "SH600338",
+      "name": "西藏珠峰",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "288ca061-57b5-490d-9dd0-a3c4f961eb64",
+      "trade_date": "2026-04-24",
+      "code": "SZ002192",
+      "name": "融捷股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "720f84e5-52f1-43cf-b782-17eda20f4764",
+      "trade_date": "2026-04-24",
+      "code": "SH603937",
+      "name": "丽岛新材",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "acb2689b-6f0b-41ea-9828-864a36d0e056",
+      "trade_date": "2026-04-27",
+      "code": "SH605006",
+      "name": "山东玻纤",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "37a6f0a6-1d7d-4c73-82f8-afd4027fd0fc",
+      "trade_date": "2026-04-27",
+      "code": "SZ002181",
+      "name": "粤传媒",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c5493f57-c313-4e0f-b370-40598aecbcd9",
+      "trade_date": "2026-04-27",
+      "code": "SH603557",
+      "name": "ST起步",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d991ee6f-a5da-4629-bd41-29d35bd06238",
+      "trade_date": "2026-04-27",
+      "code": "SZ000838",
+      "name": "*ST发展",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "113800e1-fecc-4eae-9539-57beef92524f",
+      "trade_date": "2026-04-27",
+      "code": "SH603580",
+      "name": "*ST艾艾",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "936a66f3-28fb-42d4-a741-24fb8aca136e",
+      "trade_date": "2026-04-28",
+      "code": "SH600243",
+      "name": "*ST海华",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "9f72c329-363b-49be-953a-6aee35f7a115",
+      "trade_date": "2026-04-28",
+      "code": "SH605168",
+      "name": "三人行",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "674410c5-f10f-455d-ac45-444682a062bf",
+      "trade_date": "2026-04-28",
+      "code": "SH603779",
+      "name": "威龙股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "435337fb-9fcb-4543-9686-7f604bfac878",
+      "trade_date": "2026-04-28",
+      "code": "SZ000711",
+      "name": "ST京蓝",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "50c99918-953c-4105-92d9-922c11dff5d5",
+      "trade_date": "2026-04-28",
+      "code": "SZ002989",
+      "name": "中天精装",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "a299cbbf-b01f-41bf-af07-0fa2aa8763bb",
+      "trade_date": "2026-04-29",
+      "code": "SH603937",
+      "name": "丽岛新材",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "65c6d394-5ed3-4753-a0d8-d7bffd45c356",
+      "trade_date": "2026-04-29",
+      "code": "SZ000818",
+      "name": "航锦科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "fc6bc1f6-ff57-4653-9450-638e37578ded",
+      "trade_date": "2026-04-29",
+      "code": "SH603256",
+      "name": "宏和科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c2d51551-936a-4ae5-9c14-51725ca39d97",
+      "trade_date": "2026-04-29",
+      "code": "SH600082",
+      "name": "ST海泰",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "3428a491-46ed-4c81-9899-9e6defb8bbeb",
+      "trade_date": "2026-04-29",
+      "code": "SZ002199",
+      "name": "*ST东晶",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5fcc8f31-9b8a-4bf4-bb3e-2bdd9f49ba3a",
+      "trade_date": "2026-04-29",
+      "code": "SZ002903",
+      "name": "宇环数控",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "cc569a57-c221-4121-a208-0e2bc28f56a2",
+      "trade_date": "2026-04-29",
+      "code": "SZ002655",
+      "name": "共达电声",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "4e30642a-eea3-46f3-b03d-88084cba5b17",
+      "trade_date": "2026-04-29",
+      "code": "SH603738",
+      "name": "泰晶科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c4e50f6a-094a-46e8-bebe-c9c0af7dcde4",
+      "trade_date": "2026-04-30",
+      "code": "SH603580",
+      "name": "*ST艾艾",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "945b4a18-2956-4b8c-b356-0acc57c30837",
+      "trade_date": "2026-04-30",
+      "code": "SZ002856",
+      "name": "*ST美芝",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "324e5b27-1d1e-45b6-ab99-9a3a124a4c74",
+      "trade_date": "2026-04-30",
+      "code": "SZ002640",
+      "name": "跨境通",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "30dfff91-ac9a-4876-a619-eefa0308ce42",
+      "trade_date": "2026-04-30",
+      "code": "SH600476",
+      "name": "*ST湘邮",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8cded3b1-878e-4569-9d0a-cc639cbdd36a",
+      "trade_date": "2026-04-30",
+      "code": "SH603559",
+      "name": "ST通脉",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "717d264d-8ff0-4da0-b02e-de7728a5e49b",
+      "trade_date": "2026-04-30",
+      "code": "SZ002929",
+      "name": "润建股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "14512bf1-37ae-495e-92cc-6b5f9b1b2773",
+      "trade_date": "2026-05-06",
+      "code": "SH603936",
+      "name": "博敏电子",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "7a9af2dd-0771-4c7f-8a51-7857daf840f8",
+      "trade_date": "2026-05-06",
+      "code": "SH603269",
+      "name": "海鸥股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "712e79c8-ef97-428c-8036-8321333182ec",
+      "trade_date": "2026-05-06",
+      "code": "SH600719",
+      "name": "大连热电",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ba6532e9-fa75-428c-91c3-ce877d72ff8d",
+      "trade_date": "2026-05-06",
+      "code": "SH600396",
+      "name": "华电辽能",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "f70867f1-923c-421c-9ee9-012ac79ec801",
+      "trade_date": "2026-05-07",
+      "code": "SH605006",
+      "name": "山东玻纤",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "38dfdd55-021d-4b46-97bb-19b43af99084",
+      "trade_date": "2026-05-07",
+      "code": "SH603738",
+      "name": "泰晶科技",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "1fce7ba0-2dcd-4fb6-b51e-dbf8ee5c3918",
+      "trade_date": "2026-05-07",
+      "code": "SZ000720",
+      "name": "新能泰山",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "04c536f7-5392-4786-80b9-a254c06fc1ce",
+      "trade_date": "2026-05-07",
+      "code": "SZ000826",
+      "name": "*ST启环",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "0492ea3b-0bd7-46bb-aa7f-b0522e6421f8",
+      "trade_date": "2026-05-07",
+      "code": "SZ002008",
+      "name": "大族激光",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "3aeedd1a-df54-4976-82ca-1da3ae298660",
+      "trade_date": "2026-05-07",
+      "code": "SH600537",
+      "name": "*ST亿晶",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b5f4356c-a4f5-48a1-94be-f6d1ebfca90f",
+      "trade_date": "2026-05-07",
+      "code": "SH603459",
+      "name": "红板科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d983dedf-36f0-4626-91c4-3365b2846683",
+      "trade_date": "2026-05-08",
+      "code": "SZ002199",
+      "name": "*ST东晶",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "c8449c67-3121-46f1-9f65-f91cb938bb45",
+      "trade_date": "2026-05-08",
+      "code": "SZ002691",
+      "name": "*ST冀凯",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "6a5c9ba1-d37b-493e-9bf3-3ba35076f316",
+      "trade_date": "2026-05-08",
+      "code": "SZ002569",
+      "name": "*ST步森",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "14096fe1-9124-49b5-9afc-3647dfce8e8a",
+      "trade_date": "2026-05-11",
+      "code": "SZ000711",
+      "name": "ST京蓝",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "5e831a1a-5db4-4b19-8f44-8fbde4f54e14",
+      "trade_date": "2026-05-11",
+      "code": "SZ002856",
+      "name": "*ST美芝",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "ff5a51bf-6b6c-4a62-b9b9-d028a44b9a96",
+      "trade_date": "2026-05-11",
+      "code": "SH603559",
+      "name": "ST通脉",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "a4110d2a-6126-443e-a0e3-01acdfaeda23",
+      "trade_date": "2026-05-11",
+      "code": "SH600396",
+      "name": "华电辽能",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "6297340d-adfd-4988-ac2b-ab56f3b30d41",
+      "trade_date": "2026-05-11",
+      "code": "SH688146",
+      "name": "中船特气",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "452db6e8-8ef4-4856-8942-00c925eab9ce",
+      "trade_date": "2026-05-11",
+      "code": "SZ002971",
+      "name": "和远气体",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "342ef430-3d6f-426e-b679-71ffa5be086f",
+      "trade_date": "2026-05-11",
+      "code": "SZ002789",
+      "name": "*ST建艺",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "f01beb74-e4e6-43d1-84b2-24cd073c5087",
+      "trade_date": "2026-05-12",
+      "code": "SZ002175",
+      "name": "*ST东智",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "dc6d7da9-06a0-4c09-977b-f4fd7df50764",
+      "trade_date": "2026-05-13",
+      "code": "SH603779",
+      "name": "威龙股份",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "18872d69-8ecb-4a5c-8d1b-cf7e2cf8b195",
+      "trade_date": "2026-05-13",
+      "code": "SZ002782",
+      "name": "可立克",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "52e276cb-8cd4-4307-a02c-bef920a8008d",
+      "trade_date": "2026-05-13",
+      "code": "SZ002654",
+      "name": "万润科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "aaefc644-ac12-464b-b0fb-795f7635a279",
+      "trade_date": "2026-05-13",
+      "code": "SH600903",
+      "name": "贵州燃气",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "6d78e356-c697-4334-8b94-a34c23b105a9",
+      "trade_date": "2026-05-14",
+      "code": "SZ003018",
+      "name": "金富科技",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "1d932e0f-00b8-4903-bd1b-6b5ff3abf299",
+      "trade_date": "2026-05-15",
+      "code": "SH601133",
+      "name": "柏诚股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "a0518ba3-664f-4ece-9030-ae471aab366d",
+      "trade_date": "2026-05-15",
+      "code": "SZ000518",
+      "name": "*ST四环",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "7dc828e3-a64c-4e4f-9d15-2d883ac9f433",
+      "trade_date": "2026-05-18",
+      "code": "SH603115",
+      "name": "海星股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "355487db-d1f9-4f6b-8715-6f228541dbcd",
+      "trade_date": "2026-05-18",
+      "code": "SH603989",
+      "name": "艾华集团",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "68e72ff2-6f29-4309-8251-68610b5ca98d",
+      "trade_date": "2026-05-19",
+      "code": "SZ000636",
+      "name": "风华高科",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "db45f58d-ea82-4542-8438-078257f093fa",
+      "trade_date": "2026-05-19",
+      "code": "SH600302",
+      "name": "ST标准",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "bfd4fcb7-f27d-4cb9-b65e-0d0f5b66fb63",
+      "trade_date": "2026-05-19",
+      "code": "SH600563",
+      "name": "法拉电子",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "4e123a79-73da-4dc7-aae5-20e31d2ff6e2",
+      "trade_date": "2026-05-20",
+      "code": "SZ000518",
+      "name": "四环生物",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "76801d10-2769-46dd-86a6-98e5cf3d583d",
+      "trade_date": "2026-05-20",
+      "code": "SZ003036",
+      "name": "泰坦股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "4197e376-a55f-4583-92db-94bbd8f7d202",
+      "trade_date": "2026-05-20",
+      "code": "SH603663",
+      "name": "三祥新材",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "54d10926-bccb-450a-a890-155e8e71fe82",
+      "trade_date": "2026-05-21",
+      "code": "SH600745",
+      "name": "*ST闻泰",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "e0c06958-e4f4-443f-b252-abf405944559",
+      "trade_date": "2026-05-22",
+      "code": "SZ002055",
+      "name": "ST得润",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "023d1588-1bfa-475c-b30f-c09a125d0874",
+      "trade_date": "2026-05-22",
+      "code": "SH603256",
+      "name": "宏和科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "3b053d4d-ecb9-4c10-a495-d916ec1cf8eb",
+      "trade_date": "2026-05-22",
+      "code": "SH605580",
+      "name": "恒盛能源",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "064d9e9e-50e4-4e6c-8a07-8548d1a7b2ca",
+      "trade_date": "2026-05-22",
+      "code": "SZ002199",
+      "name": "*ST东晶",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "6791ee30-93d3-4eec-9172-240ccf3d939b",
+      "trade_date": "2026-05-22",
+      "code": "SH603021",
+      "name": "*ST华鹏",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "438afa18-ded8-4ecf-b171-3e2d1d17ae1b",
+      "trade_date": "2026-05-25",
+      "code": "SH600745",
+      "name": "*ST闻泰",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "6dc0459d-2ed7-4adb-9e85-89a310ba31f7",
+      "trade_date": "2026-05-25",
+      "code": "SZ002951",
+      "name": "金时科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d4a5ca25-8c6b-4c9c-bb0c-971b3ea2c0f8",
+      "trade_date": "2026-05-25",
+      "code": "SH600730",
+      "name": "*ST高科",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "89914349-f449-487d-98d8-59f72482cd21",
+      "trade_date": "2026-05-25",
+      "code": "SZ002613",
+      "name": "北玻股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "429631b2-80c5-4f6e-9b31-7fcc60689bef",
+      "trade_date": "2026-05-25",
+      "code": "SH600863",
+      "name": "华能蒙电",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8eb126db-e545-4767-b856-7b6d30526802",
+      "trade_date": "2026-05-26",
+      "code": "SZ002251",
+      "name": "步步高",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b0693468-96f1-4c2b-82c8-07764484da3b",
+      "trade_date": "2026-05-26",
+      "code": "SH600367",
+      "name": "红星发展",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "642a0c15-0916-4f14-9ed4-977625a9114c",
+      "trade_date": "2026-05-26",
+      "code": "SH603773",
+      "name": "沃格光电",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b8a82129-39e8-4346-8bf1-bba57baae7a4",
+      "trade_date": "2026-05-28",
+      "code": "SH600180",
+      "name": "*ST瑞茂",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "9c1d37d7-cca4-44a7-8847-399e30e28018",
+      "trade_date": "2026-05-28",
+      "code": "SH600370",
+      "name": "*ST三房",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5fbed636-8b8a-4ad1-8a5e-0d92c9f7eebd",
+      "trade_date": "2026-05-28",
+      "code": "SH603678",
+      "name": "火炬电子",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "7aceac79-f184-4364-a107-44acd7769fa7",
+      "trade_date": "2026-05-28",
+      "code": "SZ002806",
+      "name": "华锋股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "2c60ce6a-5e6f-4e7b-ac7b-a7752f5864de",
+      "trade_date": "2026-05-28",
+      "code": "SH603008",
+      "name": "ST喜临门",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "0ed0c051-614f-497a-8a4f-e6187a8ce0f7",
+      "trade_date": "2026-05-29",
+      "code": "SZ002856",
+      "name": "*ST美芝",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "72fa45d3-d05d-425c-8dbe-c3c7898fe55a",
+      "trade_date": "2026-05-29",
+      "code": "SZ000010",
+      "name": "*ST美丽",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c1c34656-c31c-40d0-8963-424ccbc88b8e",
+      "trade_date": "2026-06-01",
+      "code": "SH600367",
+      "name": "红星发展",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "e5e32d27-b7ed-4e46-a28a-93b7e3adecd6",
+      "trade_date": "2026-06-01",
+      "code": "SH600180",
+      "name": "*ST瑞茂",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "b030a07e-d2e5-4ab8-90dd-48c2a2fa169d",
+      "trade_date": "2026-06-01",
+      "code": "SZ002421",
+      "name": "达实智能",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "63b8b030-0d0e-49ad-89b4-574d18fd2170",
+      "trade_date": "2026-06-03",
+      "code": "SH603938",
+      "name": "三孚股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "628f30c7-ea10-4fe6-bf35-c0e08cea0b52",
+      "trade_date": "2026-06-04",
+      "code": "SZ000056",
+      "name": "*ST皇庭",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "78c560c5-b8f3-49fd-b870-580e6afbc575",
+      "trade_date": "2026-06-04",
+      "code": "SZ003036",
+      "name": "泰坦股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "470c412c-7d1c-4753-b474-2133af0c5867",
+      "trade_date": "2026-06-04",
+      "code": "SZ002971",
+      "name": "和远气体",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "117e72b6-76c3-48cc-8f32-c103dc13d27b",
+      "trade_date": "2026-06-04",
+      "code": "SZ003043",
+      "name": "华亚智能",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "3923f8c8-5a18-43f7-a8be-de7c91d3a024",
+      "trade_date": "2026-06-05",
+      "code": "SH603823",
+      "name": "XD百合花",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "345f754d-f7c5-47e8-9a36-7bc7e138ebf6",
+      "trade_date": "2026-06-05",
+      "code": "SH603020",
+      "name": "爱普股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "71c65037-47d0-466c-b22f-68582cb03848",
+      "trade_date": "2026-06-08",
+      "code": "SZ001696",
+      "name": "宗申动力",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "a4b19889-6bd1-4337-aea7-f91e529d2fbc",
+      "trade_date": "2026-06-09",
+      "code": "SZ002971",
+      "name": "和远气体",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "a680bc56-e3be-47c8-ab82-27b50caf8990",
+      "trade_date": "2026-06-09",
+      "code": "SH603065",
+      "name": "宿迁联盛",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "f4512f48-936f-4a04-bc38-1d4daec566da",
+      "trade_date": "2026-06-09",
+      "code": "SH603002",
+      "name": "宏昌电子",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "32497fe8-16b7-4461-8bae-2334741f8ffe",
+      "trade_date": "2026-06-09",
+      "code": "SH603335",
+      "name": "迪生力",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "93933dd9-bd99-46ca-ad85-e5d11bb0c8f9",
+      "trade_date": "2026-06-11",
+      "code": "SZ002824",
+      "name": "和胜股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "35bffce4-72b0-438d-adec-164980eac99b",
+      "trade_date": "2026-06-11",
+      "code": "SZ001257",
+      "name": "盛龙股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "54386e06-e158-4bab-8845-744c04b2642b",
+      "trade_date": "2026-06-11",
+      "code": "SH600353",
+      "name": "旭光电子",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "f68a61d4-b29a-4160-88e9-00922bee7b61",
+      "trade_date": "2026-06-12",
+      "code": "SH603261",
+      "name": "*ST立航",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "64f3a943-6052-432a-8700-685cb53d7ce6",
+      "trade_date": "2026-06-12",
+      "code": "SZ002789",
+      "name": "*ST建艺",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "77cc0d06-d0c7-4c0f-a14b-a80e23149c58",
+      "trade_date": "2026-06-15",
+      "code": "SH603002",
+      "name": "宏昌电子",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "eb867be6-83a4-496d-832e-29e642efc7bb",
+      "trade_date": "2026-06-15",
+      "code": "SH600353",
+      "name": "旭光电子",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "d35face4-8ae9-4801-ac51-7988e9c75eb6",
+      "trade_date": "2026-06-15",
+      "code": "SH600545",
+      "name": "卓郎智能",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "e712375d-bb8a-4dab-9f04-13720fb5891c",
+      "trade_date": "2026-06-15",
+      "code": "SH601179",
+      "name": "中国西电",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "cb0991b2-ccca-45e0-be0a-6301896dc03f",
+      "trade_date": "2026-06-15",
+      "code": "SH603595",
+      "name": "ST东尼",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b1bcc28e-6cbc-4b3e-b7b7-298f1de79251",
+      "trade_date": "2026-06-15",
+      "code": "SH603580",
+      "name": "*ST艾艾",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b53d7929-6b26-4c28-ab31-8ebd577535a5",
+      "trade_date": "2026-06-15",
+      "code": "SH600226",
+      "name": "亨通股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "1008ab6d-cbe7-4789-912d-8d45459ba80b",
+      "trade_date": "2026-06-15",
+      "code": "SZ000811",
+      "name": "冰轮环境",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b22c6408-f7fc-4a7d-9ff6-7efcc2a2ca30",
+      "trade_date": "2026-06-15",
+      "code": "SH603407",
+      "name": "长裕集团",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ada10513-e477-4ff4-9c1c-df96d4aed756",
+      "trade_date": "2026-06-15",
+      "code": "SZ000823",
+      "name": "超声电子",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ba5e4c6f-a305-4b81-9e1e-9860577a143c",
+      "trade_date": "2026-06-15",
+      "code": "SH600549",
+      "name": "厦门钨业",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "9705f38f-3ae5-4ef9-9ac1-cc80970cf658",
+      "trade_date": "2026-06-15",
+      "code": "SZ000657",
+      "name": "中钨高新",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "f4117bf9-e9d7-40f1-ab76-b1b154056839",
+      "trade_date": "2026-06-16",
+      "code": "SZ000048",
+      "name": "京基智农",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "828a4b75-eab7-40ac-9eda-f19e78cedd00",
+      "trade_date": "2026-06-16",
+      "code": "SH603663",
+      "name": "三祥新材",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "ec130c98-0d57-4ec3-a398-00dd51e676d1",
+      "trade_date": "2026-06-16",
+      "code": "SZ002805",
+      "name": "丰元股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c90d25d3-6db7-48c5-b521-861317d8cd5e",
+      "trade_date": "2026-06-17",
+      "code": "SZ000811",
+      "name": "冰轮环境",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "f2c429d5-de2d-472c-ab78-5493e15c8389",
+      "trade_date": "2026-06-17",
+      "code": "SZ002491",
+      "name": "通鼎互联",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "c266671a-8902-4810-a5ed-1fba8c862e28",
+      "trade_date": "2026-06-17",
+      "code": "SZ001339",
+      "name": "智微智能",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "e1340779-b85d-4cae-ae40-effb25e0a27c",
+      "trade_date": "2026-06-17",
+      "code": "SH603324",
+      "name": "盛剑科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "685a829c-36f3-4615-92d2-edf56f3db5fc",
+      "trade_date": "2026-06-18",
+      "code": "SH603595",
+      "name": "ST东尼",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "64bdc060-63b7-497c-9724-a2e532c16275",
+      "trade_date": "2026-06-18",
+      "code": "SZ002713",
+      "name": "*ST东易",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "33da611e-4560-4240-99e9-e195a15fd373",
+      "trade_date": "2026-06-18",
+      "code": "SZ002354",
+      "name": "天娱数科",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b8ab71c4-18f8-4c67-9a04-47e443db3542",
+      "trade_date": "2026-06-18",
+      "code": "SH600667",
+      "name": "太极实业",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "5bab868b-1bc5-42f0-9c7f-e8ad31815dce",
+      "trade_date": "2026-06-22",
+      "code": "SH600141",
+      "name": "XD兴发集",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "cfb6c273-3565-41ce-b284-03fec7327d4b",
+      "trade_date": "2026-06-22",
+      "code": "SZ000783",
+      "name": "长江证券",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "bae79b0e-401c-45c9-9917-95c0e042075d",
+      "trade_date": "2026-06-22",
+      "code": "SZ000056",
+      "name": "*ST皇庭",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "163f6f61-01d6-464b-a5a5-a60cb4e88f0d",
+      "trade_date": "2026-06-22",
+      "code": "SH600584",
+      "name": "长电科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "57eb6811-64ee-4576-aa71-7a336e77c08b",
+      "trade_date": "2026-06-22",
+      "code": "SZ002409",
+      "name": "雅克科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "720afe17-90f1-4a50-8b12-a61e5fcc8b7b",
+      "trade_date": "2026-06-24",
+      "code": "SZ000823",
+      "name": "超声电子",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "ce1fa08d-e4ea-4a80-bd19-cbe1b453bbc1",
+      "trade_date": "2026-06-24",
+      "code": "SZ003043",
+      "name": "华亚智能",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "7b830067-efcd-4aec-a9d7-3c402f0d0665",
+      "trade_date": "2026-06-24",
+      "code": "SH603650",
+      "name": "彤程新材",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8a2b09b1-4f15-4393-801a-bf04e81e2c47",
+      "trade_date": "2026-06-24",
+      "code": "SH603061",
+      "name": "金海通",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "f4b916fc-3bbc-4dfe-a2be-08efe58cbb56",
+      "trade_date": "2026-06-24",
+      "code": "SH601133",
+      "name": "柏诚股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "8a7e79fa-595b-44a6-b815-4f5afc12bb19",
+      "trade_date": "2026-06-25",
+      "code": "SZ000056",
+      "name": "*ST皇庭",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "1e84d20f-be23-45cd-8eeb-4a5800f0c837",
+      "trade_date": "2026-06-25",
+      "code": "SH600857",
+      "name": "宁波中百",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "81c9ac53-092b-44b5-ba8b-2d6d06fec671",
+      "trade_date": "2026-06-25",
+      "code": "SH603459",
+      "name": "红板科技",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "801e584c-27c9-486e-9960-35596c692c23",
+      "trade_date": "2026-06-26",
+      "code": "SZ002559",
+      "name": "亚威股份",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "43cd78aa-2be9-486f-a613-5b955c202294",
+      "trade_date": "2026-06-29",
+      "code": "SH603580",
+      "name": "*ST艾艾",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "18726592-e284-47f3-8a79-782424ee1429",
+      "trade_date": "2026-06-30",
+      "code": "SZ002193",
+      "name": "ST如意",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "4bbcdff8-5b12-4f8e-a93e-8ae644175cfb",
+      "trade_date": "2026-06-30",
+      "code": "SZ002396",
+      "name": "星网锐捷",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "193f2b6b-1850-4cd5-ae0d-6bbcc1ea757c",
+      "trade_date": "2026-06-30",
+      "code": "SZ002717",
+      "name": "*ST岭南",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "728838bf-fa65-4e20-a2f4-df747fc15a74",
+      "trade_date": "2026-06-30",
+      "code": "SZ002747",
+      "name": "埃斯顿",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "d51cc015-b28d-4046-9dbf-070327c9acd0",
+      "trade_date": "2026-06-30",
+      "code": "SZ002586",
+      "name": "ST围海",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "89cf5ae1-a3b5-4f6c-97f2-3e3399105af3",
+      "trade_date": "2026-06-30",
+      "code": "SH603559",
+      "name": "ST通脉",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "70a36c14-bb67-47f1-82b1-cd10e4d9659a",
+      "trade_date": "2026-06-30",
+      "code": "SZ000821",
+      "name": "ST京机",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "407ed882-b2da-4b33-b61a-7b5d3bd4a718",
+      "trade_date": "2026-07-02",
+      "code": "SZ000892",
+      "name": "欢瑞世纪",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "4d56c47f-b002-483f-84f0-1ba1fa92c850",
+      "trade_date": "2026-07-03",
+      "code": "SZ002677",
+      "name": "浙江美大",
+      "before": true,
+      "after": false
+    },
+    {
+      "id": "b4a2b844-2752-4d32-9315-797e638fe847",
+      "trade_date": "2026-07-08",
+      "code": "SZ002677",
+      "name": "浙江美大",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "ae13d2ab-ce97-497a-953d-815cb9b4132d",
+      "trade_date": "2026-07-13",
+      "code": "SH603137",
+      "name": "恒尚节能",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "890e8913-013c-40ef-a212-62c30a922952",
+      "trade_date": "2026-07-13",
+      "code": "SZ001388",
+      "name": "信通电子",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "8744f8a1-a892-4c4a-9e59-cefead8a7d8f",
+      "trade_date": "2026-07-14",
+      "code": "SH603580",
+      "name": "艾艾精工",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "565922a9-e3c5-4383-86d3-86ca12619f17",
+      "trade_date": "2026-08-28",
+      "code": "SZ000560",
+      "name": "我爱我家",
+      "before": false,
+      "after": true
+    },
+    {
+      "id": "02f9c380-c710-4e3b-91de-a602c1ee6038",
+      "trade_date": "2026-08-31",
+      "code": "SH603270",
+      "name": "金帝股份",
+      "before": true,
+      "after": false
+    }
+  ],
+  "applied": false
+}

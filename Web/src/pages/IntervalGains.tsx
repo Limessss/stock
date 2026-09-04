@@ -35,7 +35,7 @@ const QUICK_DAYS = [3, 5, 10, 20, 60];
 
 export default function IntervalGainsPage() {
   const [searchParams] = useSearchParams();
-  const [days, setDays] = useState(5);
+  const [days, setDays] = useState(10);
   const [limit, setLimit] = useState(50);
   const [startDate, setStartDate] = useState<string | undefined>(() => searchParams.get("start") ?? undefined);
   const [endDate, setEndDate] = useState<string | undefined>(() => searchParams.get("end") ?? undefined);

@@ -9,6 +9,7 @@ import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_UP
+from functools import lru_cache
 from pathlib import Path
 
 import pandas as pd
@@ -27,6 +28,7 @@ class StockSentimentRow:
     board_count: int
     board_type: str
     is_new_high_100: bool
+    first_board_date: str | None = None
 
 
 def _load_names(cache_dir: Path) -> dict[str, str]:
@@ -182,7 +184,49 @@ def _scan_stock(path: Path, trade_date: str, names: dict[str, str]) -> StockSent
         board_count=board_count,
         board_type=board_type,
         is_new_high_100=is_new_high_100,
+        first_board_date=(
+            df.iloc[pos - board_count + 1]["date"].strftime("%Y-%m-%d")
+            if board_count else None
+        ),
     )
+
+
+@lru_cache(maxsize=8192)
+def _cached_stock_sentiment(
+    path: Path, trade_date: str, name: str, mtime_ns: int, size: int
+) -> StockSentimentRow | None:
+    # 文件版本参与缓存键，行情更新后自动重新计算。
+    return _scan_stock(path, trade_date, {path.stem.upper(): name})
+
+
+def _get_stock_sentiment(
+    cache_dir: Path, code: str, trade_date: str, name: str = ""
+) -> StockSentimentRow | None:
+    code = code.upper()
+    if len(code) != 8 or code[:2] not in {"SH", "SZ"} or not code[2:].isdigit():
+        return None
+    path = Path(cache_dir) / code[:2].lower() / f"{code}.parquet"
+    try:
+        stat = path.stat()
+    except OSError:
+        return None
+    return _cached_stock_sentiment(path, trade_date, name, stat.st_mtime_ns, stat.st_size)
+
+
+def get_continuous_board_count(
+    cache_dir: Path, code: str, trade_date: str, name: str = ""
+) -> int | None:
+    """由本地行情计算实际连续涨停天数；行情缺失时返回 None。"""
+    row = _get_stock_sentiment(cache_dir, code, trade_date, name)
+    return row.board_count if row is not None else None
+
+
+def get_three_board_origin(
+    cache_dir: Path, code: str, trade_date: str, name: str = ""
+) -> str | None:
+    """仅在当日实际连续三板时返回本轮首板日期，不回退到上一轮。"""
+    row = _get_stock_sentiment(cache_dir, code, trade_date, name)
+    return row.first_board_date if row is not None and row.board_count == 3 else None
 
 
 def calculate_local_sentiment(cache_dir: Path, trade_date: str) -> dict:
@@ -337,6 +381,10 @@ def _scan_stock_dates(
                     board_count=board_count,
                     board_type=board_type,
                     is_new_high_100=is_new_high_100,
+                    first_board_date=(
+                        df.iloc[pos - board_count + 1]["date"].strftime("%Y-%m-%d")
+                        if board_count else None
+                    ),
                 ),
                 direction,
             )

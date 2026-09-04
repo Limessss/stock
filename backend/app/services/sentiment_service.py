@@ -7,16 +7,25 @@ import re
 import threading
 import uuid
 from collections import Counter
-from typing import Any, Iterable
+from collections.abc import Iterable
+from pathlib import Path
+from typing import Any
 
 import pandas as pd
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
-from model.data.sentiment import calculate_local_limit_downs, calculate_local_sentiment
+from model.data.sentiment import (
+    calculate_local_limit_downs,
+    calculate_local_sentiment,
+    calculate_local_sentiment_batch,
+    get_continuous_board_count,
+    get_three_board_origin,
+)
 
 from ..core.config import settings
 from ..core.time_utils import utc_now
+from ..models.market import MarketDailySummary
 from ..models.sentiment import (
     ExternalApiSnapshot,
     SentimentDaily,
@@ -24,12 +33,11 @@ from ..models.sentiment import (
     SentimentLadderItem,
     SentimentTheme,
 )
-from ..models.market import MarketDailySummary
 from . import kaipanla_client, market_store
-
 
 PARSER_VERSION = 4
 NEGATIVE_FEEDBACK_LOOKBACK = 10
+RECENT_SYNC_DAYS = 30
 EXTERNAL_ENDPOINTS_CURRENT = (
     "limit_ladder",
     "limit_reasons",
@@ -48,6 +56,40 @@ _sync_locks: dict[str, threading.Lock] = {}
 
 def normalize_date(value: str) -> str:
     return pd.Timestamp(value).strftime("%Y-%m-%d")
+
+
+def _recent_trade_dates(limit: int = RECENT_SYNC_DAYS) -> list[str]:
+    """从本地行情缓存确定最新交易日窗口，不依赖用户选择的日期。"""
+    cache_dir = Path(settings.cache_dir)  # type: ignore[arg-type]
+    date_parts: list[pd.Series] = []
+
+    overview_path = cache_dir / "market_overview.parquet"
+    if overview_path.exists():
+        try:
+            overview = pd.read_parquet(overview_path, columns=["trade_date"], engine="pyarrow")
+            date_parts.append(
+                pd.to_datetime(overview["trade_date"], errors="coerce").dropna().tail(limit + 20)
+            )
+        except Exception:
+            pass
+
+    # 市场总览可能比个股缓存稍晚更新；取沪深样本的日期并集补齐最新交易日。
+    candidates = sorted((cache_dir / "sh").glob("*.parquet"))[:12]
+    candidates += sorted((cache_dir / "sz").glob("*.parquet"))[:12]
+    for path in candidates:
+        try:
+            frame = pd.read_parquet(path, columns=["date"], engine="pyarrow")
+        except Exception:
+            continue
+        if not frame.empty:
+            date_parts.append(
+                pd.to_datetime(frame["date"], errors="coerce").dropna().tail(limit + 20)
+            )
+
+    if not date_parts:
+        return []
+    dates = pd.concat(date_parts, ignore_index=True).drop_duplicates().sort_values()
+    return [value.strftime("%Y-%m-%d") for value in dates.tail(limit)]
 
 
 def _sync_lock(trade_date: str) -> threading.Lock:
@@ -153,6 +195,36 @@ def _all_dicts(value: Any) -> Iterable[dict[str, Any]]:
 
 
 def _parse_ladder(payload: Any) -> list[dict]:
+    # 当日 FuPanLa 天梯响应：StockList 为按板数分组的二维数组。
+    live_grouped: dict[str, dict] = {}
+    if isinstance(payload, dict) and isinstance(payload.get("StockList"), list):
+        for group in payload["StockList"]:
+            stocks = group if isinstance(group, list) and group and isinstance(group[0], list) else [group]
+            for stock in stocks:
+                if not isinstance(stock, list) or len(stock) < 2:
+                    continue
+                code = _normalize_code(stock[0])
+                if not code:
+                    continue
+                board_label = str(stock[11] if len(stock) > 11 else "").strip()
+                board_count = _as_int(stock[2] if len(stock) > 2 else None, 0)
+                if board_count <= 0:
+                    board_count = _board_count_from(board_label) or 1
+                live_grouped[code] = {
+                    "code": code,
+                    "name": str(stock[1] or "").strip(),
+                    "board_count": board_count,
+                    "board_type": board_label,
+                    "limit_time": _as_int(stock[3] if len(stock) > 3 else None, 0) or None,
+                    "reason": "",
+                    "themes": _split_themes(stock[5] if len(stock) > 5 else ""),
+                    "source": "kaipanla",
+                }
+    if live_grouped:
+        return sorted(
+            live_grouped.values(), key=lambda item: (-item["board_count"], item["code"])
+        )
+
     # 开盘啦 HisLimitResumption 的真实响应为：题材字典 + StockList 数组。
     # 数组核心位置：0代码、1名称、9连板描述、10板数、11概念、16主因、17详情。
     grouped: dict[str, dict] = {}
@@ -258,6 +330,23 @@ def _parse_ladder(payload: Any) -> list[dict]:
 
 def _parse_theme_counts(payload: Any) -> list[dict]:
     candidates: list[dict] = []
+
+    def append_candidate(name: Any, count: Any) -> None:
+        normalized_name = str(name or "").strip()
+        normalized_count = _as_int(count, -1)
+        if normalized_name and normalized_count >= 0 and len(normalized_name) <= 100:
+            candidates.append({"name": normalized_name, "count": normalized_count})
+
+    if isinstance(payload, dict):
+        # FuPanLa.ZhuShuList: [题材代码, 题材名, 股票数, ...]
+        for row in payload.get("ZhuShuList") or []:
+            if isinstance(row, list) and len(row) >= 3:
+                append_candidate(row[1], row[2])
+        # StockNewHigh.List: [题材名, "创新高数,其他数", 题材代码]
+        for row in payload.get("List") or []:
+            if isinstance(row, list) and len(row) >= 2:
+                append_candidate(row[0], row[1])
+
     for record in _all_dicts(payload):
         name = str(
             _first(
@@ -270,8 +359,7 @@ def _parse_theme_counts(payload: Any) -> list[dict]:
             _first(record, ("num", "Count", "StockCount", "Num", "number", "value", "数量"), None),
             -1,
         )
-        if name and count >= 0 and len(name) <= 100:
-            candidates.append({"name": name, "count": count})
+        append_candidate(name, count)
     best: dict[str, int] = {}
     for item in candidates:
         best[item["name"]] = max(best.get(item["name"], -1), item["count"])
@@ -363,8 +451,15 @@ def _fetch_snapshot(
     try:
         _, payload = kaipanla_client.fetch(endpoint, trade_date)
         snapshot.payload = payload
-        snapshot.status = "success" if kaipanla_client.payload_has_data(payload) else "empty"
-        snapshot.error = ""
+        business_error = kaipanla_client.payload_error(payload)
+        snapshot.status = (
+            "error"
+            if business_error
+            else "success"
+            if kaipanla_client.payload_has_data(payload)
+            else "empty"
+        )
+        snapshot.error = business_error
     except Exception as exc:
         snapshot.status = "error"
         snapshot.error = f"{type(exc).__name__}: {exc}"[:1000]
@@ -586,33 +681,67 @@ def _ensure_daily(session: Session, trade_date: str) -> SentimentDaily:
     return daily
 
 
-def _auto_mark_three_board_origins(session: Session, trade_date: str) -> int:
-    """将当日三板股回填到其最近一次首板日期的“主要首板”。"""
+def _three_board_origins(session: Session, trade_date: str) -> list[SentimentLadderItem]:
+    """按本地行情定位真实三连板的本轮首板，不使用区间累计板数。"""
     three_board_items = session.scalars(
         select(SentimentLadderItem).where(
             SentimentLadderItem.trade_date == trade_date,
-            SentimentLadderItem.board_count == 3,
         )
     ).all()
-    marked = 0
+    origins = []
     for item in three_board_items:
+        if _continuous_board_count(item) != 3:
+            continue
+        origin_date = get_three_board_origin(
+            settings.cache_dir, item.code, item.trade_date, item.name
+        )
+        if origin_date is None:
+            continue
         origin = session.scalar(
             select(SentimentLadderItem)
             .where(
                 SentimentLadderItem.code == item.code,
-                SentimentLadderItem.trade_date < trade_date,
-                SentimentLadderItem.board_count == 1,
+                SentimentLadderItem.trade_date == origin_date,
             )
-            .order_by(SentimentLadderItem.trade_date.desc())
-            .limit(1)
         )
-        if origin is None or origin.is_major_first_board:
+        if origin is not None:
+            origins.append(origin)
+    return origins
+
+
+def _auto_mark_three_board_origins(session: Session, trade_date: str) -> int:
+    """将当日真实三连板的本轮首板标为“主要首板”。"""
+    marked = 0
+    for origin in _three_board_origins(session, trade_date):
+        if origin.is_major_first_board:
             continue
         origin.is_major_first_board = True
         origin.updated_at = utc_now()
         marked += 1
     session.flush()
     return marked
+
+
+def plan_major_first_board_repair(session: Session) -> list[dict]:
+    """生成历史自动标记的修复清单；不修改数据库，不访问外部服务。"""
+    items = session.scalars(select(SentimentLadderItem)).all()
+    expected_ids = {
+        origin.id
+        for date in sorted({item.trade_date for item in items})
+        for origin in _three_board_origins(session, date)
+    }
+    return [
+        {
+            "id": item.id,
+            "trade_date": item.trade_date,
+            "code": item.code,
+            "name": item.name,
+            "before": item.is_major_first_board,
+            "after": item.id in expected_ids,
+        }
+        for item in items
+        if item.is_major_first_board != (item.id in expected_ids)
+    ]
 
 
 def _sync_market_fields(session: Session, daily: SentimentDaily) -> None:
@@ -632,6 +761,25 @@ def _sync_market_fields(session: Session, daily: SentimentDaily) -> None:
     daily.flat_count = (data or {}).get("flat_count")
 
 
+def _apply_local_result(
+    session: Session,
+    daily: SentimentDaily,
+    result: dict,
+) -> None:
+    for field in ("up_count", "down_count", "flat_count"):
+        if field in result:
+            setattr(daily, field, result[field])
+    daily.limit_up_count = result["limit_up_count"]
+    daily.limit_down_count = result["limit_down_count"]
+    daily.limit_down_stocks = result["limit_down_stocks"]
+    daily.broken_board_count = result["broken_board_count"]
+    daily.new_high_100_count = result["new_high_100_count"]
+    daily.scanned_stock_count = result["scanned_stock_count"]
+    daily.new_high_stocks = result["new_high_stocks"]
+    daily.local_complete = bool(result["complete"])
+    _replace_ladder(session, daily.trade_date, result["ladder"])
+
+
 def _sync_local(session: Session, daily: SentimentDaily, *, force: bool) -> dict:
     if daily.local_complete and not force:
         items = session.scalars(
@@ -644,6 +792,7 @@ def _sync_local(session: Session, daily: SentimentDaily, *, force: bool) -> dict
                     "name": item.name,
                     "board_count": item.board_count,
                     "board_type": item.board_type,
+                    "limit_time": item.limit_time,
                     "reason": item.reason,
                     "themes": item.themes or [],
                     "source": item.source,
@@ -654,15 +803,7 @@ def _sync_local(session: Session, daily: SentimentDaily, *, force: bool) -> dict
         }
 
     result = calculate_local_sentiment(settings.cache_dir, daily.trade_date)  # type: ignore[arg-type]
-    daily.limit_up_count = result["limit_up_count"]
-    daily.limit_down_count = result["limit_down_count"]
-    daily.limit_down_stocks = result["limit_down_stocks"]
-    daily.broken_board_count = result["broken_board_count"]
-    daily.new_high_100_count = result["new_high_100_count"]
-    daily.scanned_stock_count = result["scanned_stock_count"]
-    daily.new_high_stocks = result["new_high_stocks"]
-    daily.local_complete = bool(result["complete"])
-    _replace_ladder(session, daily.trade_date, result["ladder"])
+    _apply_local_result(session, daily, result)
     return {**result, "cached": False}
 
 
@@ -769,6 +910,109 @@ def sync_day(session: Session, trade_date: str, *, force: bool = False) -> dict:
         }
 
 
+def sync_latest(
+    session: Session,
+    *,
+    force: bool = False,
+    days: int = RECENT_SYNC_DAYS,
+) -> dict:
+    """补齐本地行情最新窗口内缺少的情绪数据。"""
+    trade_dates = _recent_trade_dates(days)
+    if not trade_dates:
+        raise ValueError("本地行情缓存中没有可同步的交易日")
+
+    daily_by_date = {
+        daily.trade_date: daily
+        for daily in session.scalars(
+            select(SentimentDaily).where(SentimentDaily.trade_date.in_(trade_dates))
+        ).all()
+    }
+    local_dates = [
+        date
+        for date in trade_dates
+        if force
+        or date not in daily_by_date
+        or not daily_by_date[date].local_complete
+    ]
+    external_retry_dates = {
+        date
+        for date, daily in daily_by_date.items()
+        if kaipanla_client.is_configured() and daily.external_status != "complete"
+    }
+    dates_to_sync = (
+        trade_dates
+        if force
+        else [
+            date
+            for date in trade_dates
+            if date in local_dates or date in external_retry_dates
+        ]
+    )
+    if not dates_to_sync:
+        return {
+            "latest_trade_date": trade_dates[-1],
+            "window_start": trade_dates[0],
+            "window_end": trade_dates[-1],
+            "window_days": len(trade_dates),
+            "synced_days": 0,
+            "skipped_days": len(trade_dates),
+            "synced_dates": [],
+            "network_requests": 0,
+            "external_statuses": {},
+        }
+
+    local_by_date = calculate_local_sentiment_batch(
+        settings.cache_dir, local_dates  # type: ignore[arg-type]
+    )
+    unavailable_dates = [
+        date
+        for date in local_dates
+        if not local_by_date.get(date) or not local_by_date[date].get("complete")
+    ]
+    if unavailable_dates:
+        raise ValueError(f"以下交易日本地行情不完整：{', '.join(unavailable_dates)}")
+
+    synced_dates: list[str] = []
+    network_requests = 0
+    external_statuses: dict[str, str] = {}
+    for date in dates_to_sync:
+        with _sync_lock(date):
+            daily = _ensure_daily(session, date)
+            daily.sync_error = ""
+            if date in local_dates:
+                result = local_by_date[date]
+                _sync_market_fields(session, daily)
+                _apply_local_result(session, daily, result)
+                local_ladder = list(result.get("ladder") or [])
+            else:
+                local = _sync_local(session, daily, force=False)
+                local_ladder = list(local.get("ladder") or [])
+            external = _sync_external(
+                session,
+                daily,
+                local_ladder,
+                force=force or date in external_retry_dates,
+            )
+            _auto_mark_three_board_origins(session, date)
+            daily.updated_at = utc_now()
+            network_requests += int(external.get("network_requests", 0))
+            external_statuses[date] = daily.external_status
+            synced_dates.append(date)
+
+    session.commit()
+    return {
+        "latest_trade_date": trade_dates[-1],
+        "window_start": trade_dates[0],
+        "window_end": trade_dates[-1],
+        "window_days": len(trade_dates),
+        "synced_days": len(synced_dates),
+        "skipped_days": len(trade_dates) - len(synced_dates),
+        "synced_dates": synced_dates,
+        "network_requests": network_requests,
+        "external_statuses": external_statuses,
+    }
+
+
 def _theme_dict(theme: SentimentTheme) -> dict:
     return {
         "id": theme.id,
@@ -781,12 +1025,22 @@ def _theme_dict(theme: SentimentTheme) -> dict:
     }
 
 
+def _continuous_board_count(item: SentimentLadderItem) -> int | None:
+    # “几天几板”与反包标签记录区间涨停次数，不能直接当作连续板数。
+    if re.search(r"\d+\s*天\s*\d+\s*板|断板|反包", item.board_type or ""):
+        return get_continuous_board_count(
+            settings.cache_dir, item.code, item.trade_date, item.name
+        )
+    return item.board_count
+
+
 def _ladder_dict(item: SentimentLadderItem) -> dict:
     return {
         "id": item.id,
         "code": item.code,
         "name": item.name,
         "board_count": item.board_count,
+        "continuous_board_count": _continuous_board_count(item),
         "board_type": item.board_type,
         "limit_time": item.limit_time,
         "reason": item.reason,
@@ -907,8 +1161,14 @@ def get_day(session: Session, trade_date: str) -> dict | None:
     }
     for item in themes:
         by_category.setdefault(item.category, []).append(_theme_dict(item))
-    max_board = max((item.board_count for item in ladder), default=0)
-    three_board_count = sum(1 for item in ladder if item.board_count == 3)
+    ladder_items = [_ladder_dict(item) for item in ladder]
+    ladder_items.sort(key=lambda item: (
+        -(item["continuous_board_count"] or 0),
+        item["limit_time"] or 9_999_999_999,
+        item["code"],
+    ))
+    max_board = max((item["continuous_board_count"] or 0 for item in ladder_items), default=0)
+    three_board_count = sum(1 for item in ladder_items if item["continuous_board_count"] == 3)
     total_amount, amount_change_pct = _market_volume(session, date)
     return {
         "trade_date": date,
@@ -933,7 +1193,7 @@ def get_day(session: Session, trade_date: str) -> dict | None:
         "ladder": {
             "max_board": max_board,
             "three_board_count": three_board_count,
-            "items": [_ladder_dict(item) for item in ladder],
+            "items": ladder_items,
         },
         "negative_feedback": _negative_feedback_for_day(session, daily),
         "sync_status": {
@@ -961,14 +1221,9 @@ def get_matrix(
         day = get_day(session, date)
         if day is None:
             continue
-        # 矩阵不展示普通首板、二板和百日新高个股明细。剔除这些大字段可显著
+        # 矩阵保留全部梯队股票，仅剔除不展示的百日新高个股明细，
         # 降低历史分页的 JSON 体积；单日接口仍返回完整数据。
         day["new_high_stocks"] = []
-        day["ladder"]["items"] = [
-            item
-            for item in day["ladder"]["items"]
-            if item["board_count"] >= 3 or item["is_major_first_board"]
-        ]
         result.append(day)
     return result
 
@@ -980,7 +1235,7 @@ def set_major_first_boards(session: Session, trade_date: str, codes: list[str]) 
         select(SentimentLadderItem).where(SentimentLadderItem.trade_date == date)
     ).all()
     for item in items:
-        item.is_major_first_board = item.board_count == 1 and item.code in selected
+        item.is_major_first_board = _continuous_board_count(item) == 1 and item.code in selected
         item.updated_at = utc_now()
     session.commit()
     return get_day(session, date) or {}

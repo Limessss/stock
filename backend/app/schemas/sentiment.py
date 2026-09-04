@@ -55,6 +55,7 @@ class SentimentLadderItem(BaseModel):
     code: str
     name: str = ""
     board_count: int
+    continuous_board_count: int | None = None
     board_type: str = ""
     limit_time: int | None = None
     reason: str = ""
@@ -141,6 +142,18 @@ class SentimentSyncResponse(BaseModel):
     configured: bool
     network_requests: int
     statuses: dict[str, str] = Field(default_factory=dict)
+
+
+class SentimentLatestSyncResponse(BaseModel):
+    latest_trade_date: str
+    window_start: str
+    window_end: str
+    window_days: int
+    synced_days: int
+    skipped_days: int
+    synced_dates: list[str] = Field(default_factory=list)
+    network_requests: int
+    external_statuses: dict[str, str] = Field(default_factory=dict)
 
 
 class MajorFirstBoardsUpdate(BaseModel):

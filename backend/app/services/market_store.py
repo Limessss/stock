@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
-from zoneinfo import ZoneInfo
 
 from model.data.a_stock_market import (
     INDEX_SPECS,
@@ -14,6 +14,7 @@ from model.data.a_stock_market import (
     fetch_market_stats,
     get_trading_calendar,
     recalc_index_change,
+    tdx_index_amount_sum,
     tencent_index_kline,
 )
 from model.data.time_util import is_after_market_close
@@ -98,6 +99,19 @@ def summary_needs_refresh(session: Session, trade_date: str) -> bool:
         or summary.down_count is None
         or summary.total_amount is None
     )
+
+
+def amount_needs_refresh(session: Session, trade_date: str) -> bool:
+    """识别历史上误存为两市合计的单市场成交额。"""
+    if not is_after_market_close(trade_date):
+        return False
+    summary = session.get(MarketDailySummary, trade_date)
+    if summary is None or summary.total_amount is None:
+        return False
+    expected = tdx_index_amount_sum(trade_date, settings.raw_dir)
+    if expected is None or expected <= 0:
+        return False
+    return abs(float(summary.total_amount) - expected) / expected >= 0.05
 
 
 def _market_close_utc(trade_date: str) -> datetime:
@@ -195,7 +209,11 @@ def needs_change_refresh(session: Session, trade_date: str) -> bool:
 def refresh_market_stats(session: Session, trade_date: str) -> None:
     """仅补拉并更新涨跌家数、成交额汇总。"""
     cache_dir = settings.cache_dir
-    stats = fetch_market_stats(trade_date, cache_dir=cache_dir)
+    stats = fetch_market_stats(
+        trade_date,
+        cache_dir=cache_dir,
+        raw_dir=settings.raw_dir,
+    )
     if stats.up_count is None and stats.down_count is None and stats.total_amount is None:
         return
 
@@ -217,7 +235,11 @@ def refresh_market_stats(session: Session, trade_date: str) -> None:
 def fetch_and_save(session: Session, trade_date: str) -> dict:
     """从 HTTP 拉取并入库。"""
     cache_dir = settings.cache_dir
-    payload = fetch_market_day(trade_date, cache_dir=cache_dir)
+    payload = fetch_market_day(
+        trade_date,
+        cache_dir=cache_dir,
+        raw_dir=settings.raw_dir,
+    )
     if any(i.get("close") is not None for i in payload.get("indices", [])):
         save_market_day(session, payload)
         session.commit()
@@ -238,6 +260,9 @@ def ensure_market_day(session: Session, trade_date: str) -> tuple[bool, bool]:
         fetched = True
     elif needs_change_refresh(session, trade_date):
         fetch_and_save(session, trade_date)
+        fetched = True
+    elif amount_needs_refresh(session, trade_date):
+        refresh_market_stats(session, trade_date)
         fetched = True
     elif summary_needs_refresh(session, trade_date):
         refresh_market_stats(session, trade_date)

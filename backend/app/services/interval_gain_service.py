@@ -200,7 +200,16 @@ def _read_matrix_gains(
         return None
     start_values = pd.to_numeric(frame[start_date], errors="coerce")
     end_values = pd.to_numeric(frame[end_date], errors="coerce")
-    valid = start_values.notna() & end_values.notna() & (start_values > 0)
+    codes = frame["code"].astype(str).str.upper()
+    valid = (
+        start_values.notna()
+        & end_values.notna()
+        & np.isfinite(start_values)
+        & np.isfinite(end_values)
+        & (start_values > 0)
+        & (end_values > 0)
+        & codes.str.fullmatch(r"(?:SH|SZ|BJ)\d{6}")
+    )
     if not valid.any():
         return []
     selected = frame.loc[valid, ["code"]].copy()
@@ -228,16 +237,11 @@ def _resolve_period(
     days: int,
     start_date: str | None = None,
 ) -> tuple[str, str, int]:
-    path = cache_dir / "market_overview.parquet"
-    if not path.exists():
-        raise ValueError("缺少市场交易日缓存，请先在数据管理中更新本地行情")
-    try:
-        frame = pd.read_parquet(path, columns=["trade_date"], engine="pyarrow")
-    except Exception as exc:
-        raise ValueError(f"市场交易日缓存读取失败: {exc}") from exc
-    if frame.empty:
-        raise ValueError("市场交易日缓存为空")
-    dates = pd.to_datetime(frame["trade_date"], errors="coerce").dropna().drop_duplicates().sort_values()
+    # 直接从个股行情缓存取交易日，避免 market_overview 更新滞后导致默认区间不是最新。
+    available_dates = _matrix_dates(cache_dir)
+    if not available_dates:
+        raise ValueError("缺少个股交易日缓存，请先在数据管理中更新本地行情")
+    dates = pd.Series(pd.to_datetime(available_dates)).drop_duplicates().sort_values()
     if end_date:
         target = pd.Timestamp(end_date)
         dates = dates[dates <= target]
@@ -295,7 +299,12 @@ def _read_gain(path: Path, start_date: str, end_date: str, names: dict[str, str]
         return None
     start_close = float(closes.loc[start_key])
     end_close = float(closes.loc[end_key])
-    if start_close <= 0 or not math.isfinite(start_close) or not math.isfinite(end_close):
+    if (
+        start_close <= 0
+        or end_close <= 0
+        or not math.isfinite(start_close)
+        or not math.isfinite(end_close)
+    ):
         return None
     code = path.stem.upper()
     return {
@@ -333,7 +342,7 @@ def get_interval_gains(
     *,
     start_date: str | None = None,
     end_date: str | None = None,
-    days: int = 5,
+    days: int = 10,
     limit: int = 50,
 ) -> dict[str, Any]:
     """统计全市场区间涨幅；同一行情版本与区间只扫描一次。"""

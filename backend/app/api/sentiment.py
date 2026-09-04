@@ -18,6 +18,7 @@ from ..schemas.sentiment import (
     MajorFirstBoardsUpdate,
     SentimentDay,
     SentimentFeedbackItem,
+    SentimentLatestSyncResponse,
     SentimentMatrixResponse,
     SentimentSyncRequest,
     SentimentSyncResponse,
@@ -145,7 +146,7 @@ def sentiment_matrix(
 def sentiment_interval_gains(
     start: str | None = Query(default=None, max_length=10),
     end: str | None = Query(default=None, max_length=10),
-    days: int = Query(default=5, ge=1, le=250),
+    days: int = Query(default=10, ge=1, le=250),
     limit: int = Query(default=50, ge=10, le=500),
 ) -> IntervalGainResponse:
     try:
@@ -159,6 +160,22 @@ def sentiment_interval_gains(
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
     return IntervalGainResponse.model_validate(result)
+
+
+@router.post("/sentiment/sync-latest", response_model=SentimentLatestSyncResponse)
+def sync_latest_sentiment(
+    body: SentimentSyncRequest,
+    session: Session = Depends(get_session),
+) -> SentimentLatestSyncResponse:
+    try:
+        result = sentiment_service.sync_latest(session, force=body.force)
+    except ValueError as exc:
+        session.rollback()
+        raise HTTPException(400, str(exc)) from exc
+    except Exception as exc:
+        session.rollback()
+        raise HTTPException(500, f"情绪数据批量同步失败: {exc}") from exc
+    return SentimentLatestSyncResponse.model_validate(result)
 
 
 @router.put("/sentiment/feedback/{feedback_id}", response_model=SentimentFeedbackItem)

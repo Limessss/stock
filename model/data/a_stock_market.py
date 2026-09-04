@@ -18,6 +18,7 @@ from typing import Any
 
 import requests
 
+from .tdx_parser import parse_day_file
 from .time_util import is_after_market_close, is_trading_session
 
 UA = (
@@ -655,7 +656,12 @@ def _amount_from_indices(indices: list[dict]) -> float | None:
     return total if ok else None
 
 
-def fetch_market_day(trade_date: str, *, cache_dir: Path | None = None) -> dict:
+def fetch_market_day(
+    trade_date: str,
+    *,
+    cache_dir: Path | None = None,
+    raw_dir: Path | None = None,
+) -> dict:
     """从 HTTP 拉取完整交易日数据（供数据库持久化）。"""
     indices = [
         {
@@ -674,7 +680,7 @@ def fetch_market_day(trade_date: str, *, cache_dir: Path | None = None) -> dict:
         for b in fetch_index_daily_bars(trade_date)
     ]
     align_index_changes_from_calendar(trade_date, indices)
-    stats = fetch_market_stats(trade_date, cache_dir=cache_dir)
+    stats = fetch_market_stats(trade_date, cache_dir=cache_dir, raw_dir=raw_dir)
     total_amount = stats.total_amount
     if total_amount is None:
         total_amount = _amount_from_indices(indices)
@@ -839,20 +845,51 @@ def eastmoney_index_amount_sum() -> float | None:
 
 def eastmoney_historical_amount(trade_date: str) -> float | None:
     """历史成交额：上证+深证成指指数 K 线 amount 之和（东财 push2his）。"""
-    total = 0.0
-    ok = False
+    amounts: list[float] = []
     for secid in ("1.000001", "0.399001"):
         try:
             bar = eastmoney_index_kline(secid, trade_date)
         except Exception:
             bar = None
-        if bar and bar.get("amount"):
-            total += float(bar["amount"])
-            ok = True
-    return total if ok else None
+        amount = bar.get("amount") if bar else None
+        if amount is None or float(amount) <= 0:
+            # 任一市场缺失时不能把单市场金额误当成沪深合计。
+            return None
+        amounts.append(float(amount))
+    return sum(amounts) if len(amounts) == 2 else None
 
 
-def fetch_market_stats(trade_date: str, *, cache_dir: Path | None = None) -> MarketStats:
+def tdx_index_amount_sum(trade_date: str, raw_dir: Path | None) -> float | None:
+    """从通达信官方上证、深证指数日线读取两市成交额合计。"""
+    if raw_dir is None:
+        return None
+    paths = (
+        raw_dir / "sh" / "lday" / "sh000001.day",
+        raw_dir / "sz" / "lday" / "sz399001.day",
+    )
+    amounts: list[float] = []
+    target = _norm_date(trade_date)
+    for path in paths:
+        frame = parse_day_file(path)
+        if frame is None or frame.empty:
+            return None
+        dates = frame["date"].dt.strftime("%Y-%m-%d")
+        rows = frame.loc[dates == target, "amount"]
+        if rows.empty:
+            return None
+        amount = _to_float(rows.iloc[-1])
+        if amount is None or amount <= 0:
+            return None
+        amounts.append(amount)
+    return sum(amounts) if len(amounts) == 2 else None
+
+
+def fetch_market_stats(
+    trade_date: str,
+    *,
+    cache_dir: Path | None = None,
+    raw_dir: Path | None = None,
+) -> MarketStats:
     """获取涨跌家数与成交额。"""
     latest = eastmoney_latest_trade_date()
     calendar = get_trading_calendar()
@@ -906,7 +943,9 @@ def fetch_market_stats(trade_date: str, *, cache_dir: Path | None = None) -> Mar
             except Exception:
                 pass
 
-        amount = eastmoney_historical_amount(trade_date)
+        amount = tdx_index_amount_sum(trade_date, raw_dir)
+        if amount is None:
+            amount = eastmoney_historical_amount(trade_date)
         if amount is None:
             try:
                 amount = eastmoney_index_amount_sum()
@@ -923,7 +962,9 @@ def fetch_market_stats(trade_date: str, *, cache_dir: Path | None = None) -> Mar
                 amount,
             )
 
-    amount = eastmoney_historical_amount(trade_date)
+    amount = tdx_index_amount_sum(trade_date, raw_dir)
+    if amount is None:
+        amount = eastmoney_historical_amount(trade_date)
     if cache_dir is not None:
         from .market_overview import lookup_cached_market_stats
 
@@ -974,7 +1015,11 @@ def _fetch_overview_cached(trade_date: str, cache_dir_str: str) -> dict:
         if disk and any(i.get("close") is not None for i in disk.get("indices", [])):
             return disk
 
-    payload = fetch_market_day(trade_date)
+    payload = fetch_market_day(
+        trade_date,
+        cache_dir=cache_dir,
+        raw_dir=cache_dir.parent / "raw",
+    )
     has_data = any(i.get("close") is not None for i in payload.get("indices", [])) or payload.get(
         "total_amount"
     )

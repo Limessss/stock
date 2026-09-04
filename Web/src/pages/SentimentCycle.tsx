@@ -30,7 +30,7 @@ import dayjs from "dayjs";
 import {
   fetchSentimentDay,
   fetchSentimentMatrix,
-  syncSentimentDay,
+  syncSentimentLatest,
   updateMajorFirstBoards,
   type SentimentDay,
   type SentimentLadderItem,
@@ -69,13 +69,6 @@ function formatAmount(value: number | null): string {
 function formatLimitTime(value: number | null): string {
   if (!value) return "";
   return dayjs.unix(value).tz(BEIJING_TZ).format("HH:mm:ss");
-}
-
-function isContinuousBoard(item: SentimentLadderItem): boolean {
-  const boardType = item.board_type.trim();
-  if (/\d+\s*天\s*\d+\s*板/.test(boardType)) return false;
-  if (/(断板|反包)/.test(boardType)) return false;
-  return true;
 }
 
 function sourceTag(source: string) {
@@ -134,7 +127,7 @@ function MatrixStockCards({
   if (!stocks.length) return <Text type="secondary">—</Text>;
   const visibleStocks = stocks.slice(0, 4);
   const hiddenCount = stocks.length - visibleStocks.length;
-  const boardCount = stocks[0]?.board_count;
+  const boardCount = stocks[0]?.continuous_board_count;
 
   const renderCard = (stock: SentimentLadderItem) => {
     const isCycleLeader = highlightKeys?.has(`${tradeDate}:${stock.code}`);
@@ -146,7 +139,7 @@ function MatrixStockCards({
       >
         <button
           type="button"
-          className={`sentiment-matrix-stock-card ${stock.board_count >= 5 ? "is-high" : ""} ${isCycleLeader ? "is-cycle-leader" : ""}`}
+          className={`sentiment-matrix-stock-card ${(stock.continuous_board_count ?? 0) >= 5 ? "is-high" : ""} ${isCycleLeader ? "is-cycle-leader" : ""}`}
           onClick={() => onOpen({ code: stock.code, name: stock.name, signalDate: tradeDate })}
         >
           <div className="sentiment-matrix-stock-title">
@@ -356,10 +349,10 @@ function MatrixView({
       for (const timeline of timelineByCode.values()) {
         timeline.sort((left, right) => left.tradeDate.localeCompare(right.tradeDate));
         timeline.forEach((point, highIndex) => {
-          if (point.item.board_count < 6) return;
+          if ((point.item.continuous_board_count ?? 0) < 6) return;
           let originIndex = -1;
           for (let index = highIndex; index >= 0; index -= 1) {
-            if (timeline[index].item.board_count === 1) {
+            if (timeline[index].item.continuous_board_count === 1) {
               originIndex = index;
               break;
             }
@@ -367,7 +360,7 @@ function MatrixView({
           const startIndex = originIndex >= 0 ? originIndex : 0;
           for (let index = startIndex; index <= highIndex; index += 1) {
             const stage = timeline[index];
-            if ([1, 3, 4, 5].includes(stage.item.board_count)) {
+            if ([1, 2, 3, 4, 5].includes(stage.item.continuous_board_count ?? 0)) {
               keys.add(`${stage.tradeDate}:${stage.item.code}`);
             }
           }
@@ -428,14 +421,14 @@ function MatrixView({
         render: (day: SentimentDay) =>
           <span className="sentiment-metric-bold">{day.ladder.max_board ? `${day.ladder.max_board}板` : "—"}</span>,
       },
-      ...[6, 5, 4, 3].map((height) => ({
+      ...[6, 5, 4, 3, 2].map((height) => ({
         key: `board-${height}`,
         label: height === 6 ? "6板+" : `${height}板`,
         render: (day: SentimentDay) => {
           const stocks = day.ladder.items.filter((item) =>
             height === 6
-              ? item.board_count >= 6
-              : item.board_count === height && isContinuousBoard(item)
+              ? (item.continuous_board_count ?? 0) >= 6
+              : item.continuous_board_count === height
           );
           return (
             <MatrixStockCards
@@ -461,6 +454,18 @@ function MatrixView({
             />
           );
         },
+      },
+      {
+        key: "all-first",
+        label: "全部首板",
+        render: (day: SentimentDay) => (
+          <MatrixStockCards
+            stocks={day.ladder.items.filter((item) => item.continuous_board_count === 1)}
+            tradeDate={day.trade_date}
+            onOpen={onOpenStock}
+            highlightKeys={leaderPathKeys}
+          />
+        ),
       },
       {
         key: "negative",
@@ -634,19 +639,23 @@ export default function SentimentCyclePage() {
 
   const invalidate = async () => {
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["sentiment-day", selectedDate] }),
+      queryClient.invalidateQueries({ queryKey: ["sentiment-day"] }),
       queryClient.invalidateQueries({ queryKey: ["sentiment-matrix"] }),
     ]);
   };
 
   const syncMut = useMutation({
-    mutationFn: (force: boolean) => syncSentimentDay(selectedDate, force),
+    mutationFn: (force: boolean) => syncSentimentLatest(force),
     onSuccess: async (result) => {
+      setSelectedDate(result.latest_trade_date);
       await invalidate();
-      if (result.network_requests > 0) {
-        message.success(`同步完成，外部请求 ${result.network_requests} 次并已缓存`);
+      if (result.synced_days > 0) {
+        const networkText = result.network_requests > 0
+          ? `，外部请求 ${result.network_requests} 次并已缓存`
+          : "";
+        message.success(`已处理 ${result.synced_days} 个缺失或外部不完整交易日，最新 ${result.latest_trade_date}${networkText}`);
       } else {
-        message.success(result.local_cached ? "已使用缓存，无外部请求" : "本地数据计算完成");
+        message.success(`最近 ${result.window_days} 个交易日数据已完整，最新 ${result.latest_trade_date}`);
       }
     },
     onError: (error: Error) => message.error(error.message),
@@ -670,14 +679,15 @@ export default function SentimentCyclePage() {
   const ladderGroups = useMemo(() => {
     const groups = new Map<number, SentimentLadderItem[]>();
     for (const item of day?.ladder.items ?? []) {
-      if (item.board_count < 2) continue;
-      const list = groups.get(item.board_count) ?? [];
+      const height = item.continuous_board_count ?? 0;
+      if (height < 2) continue;
+      const list = groups.get(height) ?? [];
       list.push(item);
-      groups.set(item.board_count, list);
+      groups.set(height, list);
     }
     return [...groups.entries()].sort((a, b) => b[0] - a[0]);
   }, [day]);
-  const firstBoards = day?.ladder.items.filter((item) => item.board_count === 1) ?? [];
+  const firstBoards = day?.ladder.items.filter((item) => item.continuous_board_count === 1) ?? [];
 
   return (
     <div className="sentiment-page">
@@ -686,11 +696,28 @@ export default function SentimentCyclePage() {
           <Title level={3} style={{ margin: 0 }}>连板梯队</Title>
           <Text type="secondary">本地行情优先 · 外部数据每日一次缓存 · 主观判断人工确认</Text>
         </div>
-        <Segmented
-          value={view}
-          options={[{ label: "矩阵视图", value: "matrix" }, { label: "单日视图", value: "day" }]}
-          onChange={(value) => setView(value as "matrix" | "day")}
-        />
+        <Space wrap>
+          <Segmented
+            value={view}
+            options={[{ label: "矩阵视图", value: "matrix" }, { label: "单日视图", value: "day" }]}
+            onChange={(value) => setView(value as "matrix" | "day")}
+          />
+          <Button
+            type="primary"
+            icon={<CloudDownloadOutlined />}
+            loading={syncMut.isPending}
+            onClick={() => syncMut.mutate(false)}
+          >
+            同步至最新
+          </Button>
+          <Popconfirm
+            title="重新同步最近 30 个交易日？"
+            description="将重新计算本地数据，并重新访问已配置的外部数据源。"
+            onConfirm={() => syncMut.mutate(true)}
+          >
+            <Button icon={<ReloadOutlined />} loading={syncMut.isPending}>重建近 30 日</Button>
+          </Popconfirm>
+        </Space>
       </Space>
 
       {view === "matrix" && (
@@ -716,28 +743,13 @@ export default function SentimentCyclePage() {
                 value={dayjs(selectedDate)}
                 onChange={(value) => value && setSelectedDate(value.format("YYYY-MM-DD"))}
               />
-              <Button
-                type="primary"
-                icon={<CloudDownloadOutlined />}
-                loading={syncMut.isPending}
-                onClick={() => syncMut.mutate(false)}
-              >
-                同步并缓存
-              </Button>
-              <Popconfirm
-                title="强制重新请求外部数据？"
-                description="仅在缓存异常时使用，同一日期会重新访问已配置的数据源。"
-                onConfirm={() => syncMut.mutate(true)}
-              >
-                <Button icon={<ReloadOutlined />} loading={syncMut.isPending}>强制重同步</Button>
-              </Popconfirm>
-              <Text type="secondary">普通页面刷新不会访问外部接口</Text>
+              <Text type="secondary">日期仅用于查看历史快照；同步始终补齐本地行情最新 30 个交易日</Text>
             </Space>
           </Card>
 
           {dayQ.isLoading && <Card><Spin /></Card>}
           {!dayQ.isLoading && !day && (
-            <Card><Empty description="该日期尚无快照"><Button type="primary" onClick={() => syncMut.mutate(false)}>首次同步</Button></Empty></Card>
+            <Card><Empty description="该日期尚无快照"><Button type="primary" loading={syncMut.isPending} onClick={() => syncMut.mutate(false)}>同步至最新</Button></Empty></Card>
           )}
 
           {day && (

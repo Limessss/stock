@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
   type ChangeEvent,
+  type CSSProperties,
   type DragEvent as ReactDragEvent,
   type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
@@ -63,6 +64,7 @@ const { Title, Text } = Typography;
 const STORAGE_KEY = "stockmodel.leader-cycle-panorama.v1";
 const VIEW_STORAGE_KEY = "stockmodel.leader-cycle-panorama.view.v1";
 const YEAR_BARS = 252;
+const DEFAULT_RANGE_DAYS = 180;
 const MAX_INSTRUMENTS = 100;
 const MAX_OVERLAY_INSTRUMENTS = 20;
 
@@ -147,6 +149,15 @@ function gainPct(first?: number, last?: number): number | null {
 function klineOptions(range: PanoramaRange | null) {
   if (!range) return { lastN: YEAR_BARS };
   return { lastN: YEAR_BARS, endDate: range.end, minDate: range.start };
+}
+
+function recentCalendarRange(candles: Array<{ time: string }>): PanoramaRange | null {
+  const end = candles.at(-1)?.time;
+  if (!end) return null;
+  return {
+    start: dayjs(end).subtract(DEFAULT_RANGE_DAYS, "day").format("YYYY-MM-DD"),
+    end,
+  };
 }
 
 function LazyPanoramaChartSlot({ compact, children }: { compact: boolean; children: ReactNode }) {
@@ -406,6 +417,10 @@ export default function LeaderCyclePanoramaPage() {
       .filter((bar) => !activeRange || (bar.time >= activeRange.start && bar.time <= activeRange.end))
       .map((bar) => bar.time),
     [activeRange, calendarQuery.data?.candles]
+  );
+  const defaultRange = useMemo(
+    () => recentCalendarRange(calendarQuery.data?.candles ?? []),
+    [calendarQuery.data?.candles]
   );
 
   const overlayInstruments = instruments.slice(0, MAX_OVERLAY_INSTRUMENTS);
@@ -719,13 +734,16 @@ export default function LeaderCyclePanoramaPage() {
   }, [applyRange, draftEnd, draftStart]);
 
   const resetRange = useCallback(() => {
-    setDraftStart(undefined);
-    setDraftEnd(undefined);
-    setActiveRange(null);
-    setSyncVisibleRange(null);
+    if (!defaultRange) return;
+    applyRange(defaultRange);
     setSelectedPresetId(undefined);
     setLoadedPresetId(undefined);
-  }, []);
+  }, [applyRange, defaultRange]);
+
+  useEffect(() => {
+    if (!defaultRange || activeRange || draftStart || draftEnd || loadedPresetId) return;
+    applyRange(defaultRange);
+  }, [activeRange, applyRange, defaultRange, draftEnd, draftStart, loadedPresetId]);
 
   const selectedPreset = useMemo(
     () => (presetsQuery.data ?? []).find((item) => item.id === selectedPresetId),
@@ -805,7 +823,7 @@ export default function LeaderCyclePanoramaPage() {
             ? `自定义区间 ${activeRange.start} — ${activeRange.end}`
             : syncVisibleRange
               ? `联动视窗 ${syncVisibleRange.from} — ${syncVisibleRange.to}`
-              : "默认展示最近一年；缩放任一K线可同步视窗"}</span>
+              : "默认展示近180天；缩放任一K线可同步视窗"}</span>
         </div>
       </div>
 
@@ -829,7 +847,13 @@ export default function LeaderCyclePanoramaPage() {
               onChange={(value: Dayjs | null) => setDraftEnd(value?.format("YYYY-MM-DD"))}
             />
             <Button type="primary" icon={<CalendarRange size={15} />} onClick={applyDraftRange}>应用区间</Button>
-            <Button icon={<RotateCcw size={15} />} disabled={!activeRange} onClick={resetRange}>最近一年</Button>
+            <Button
+              icon={<RotateCcw size={15} />}
+              disabled={!defaultRange || (
+                activeRange?.start === defaultRange.start && activeRange?.end === defaultRange.end
+              )}
+              onClick={resetRange}
+            >近180天</Button>
             <Button
               icon={<Save size={15} />}
               loading={updatePresetMutation.isPending}
@@ -944,7 +968,7 @@ export default function LeaderCyclePanoramaPage() {
                 ]}
                 onChange={(value) => setGridColumns(Number(value) === 3 ? 3 : 2)}
               />
-              <Text type="secondary">网格模式仅显示K线与均线</Text>
+              <Text type="secondary">网格模式仅显示K线与均线 · 按列向下排列</Text>
             </>
           )}
           {viewMode === "overlay" && (
@@ -1014,7 +1038,13 @@ export default function LeaderCyclePanoramaPage() {
           </Card>
         </div>
       ) : (
-        <div className={`panorama-chart-list${viewMode === "grid" ? ` is-grid is-grid-${gridColumns}` : ""}`}>
+        <div
+          className={`panorama-chart-list${viewMode === "grid" ? ` is-grid is-grid-${gridColumns}` : ""}`}
+          style={viewMode === "grid" ? {
+            "--panorama-grid-rows-2": Math.max(1, Math.ceil(instruments.length / 2)),
+            "--panorama-grid-rows-3": Math.max(1, Math.ceil(instruments.length / 3)),
+          } as CSSProperties : undefined}
+        >
           {timeDomain.length > 0 && instruments.map((instrument, index) => (
             <LazyPanoramaChartSlot key={instrument.code} compact={viewMode === "grid"}>
               <PanoramaChartRow

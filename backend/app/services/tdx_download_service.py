@@ -104,15 +104,35 @@ def _match_js_value(text: str, name: str) -> str:
 
 def fetch_remote_info() -> dict[str, str]:
     """读取轻量更新信息；每次显式同步最多调用一次。"""
-    headers = {"User-Agent": USER_AGENT, "Referer": "https://www.tdx.com.cn/article/vipdata.html"}
+    headers = {
+        "User-Agent": USER_AGENT,
+        "Referer": "https://www.tdx.com.cn/article/vipdata.html",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
+    }
+    # 通达信的固定版本文件可能被 CDN 返回前一日缓存；查询参数用于绕过旧缓存。
+    cache_buster = str(time.time_ns())
+    zip_headers: dict[str, str] = {}
     with httpx.Client(timeout=15, follow_redirects=True, headers=headers) as client:
-        response = client.get(TDX_INFO_URL)
+        response = client.get(TDX_INFO_URL, params={"_": cache_buster})
         response.raise_for_status()
+        try:
+            zip_response = client.head(TDX_ZIP_URL, params={"_": cache_buster})
+            zip_response.raise_for_status()
+            zip_headers = {
+                "zip_etag": zip_response.headers.get("ETag", ""),
+                "zip_last_modified": zip_response.headers.get("Last-Modified", ""),
+                "zip_content_length": zip_response.headers.get("Content-Length", ""),
+            }
+        except httpx.HTTPError:
+            # 部分代理可能不允许 HEAD；版本 JS 仍可作为兼容回退。
+            pass
     text = response.text
     return {
         "url": TDX_ZIP_URL,
         "size": _match_js_value(text, "HSJDAY_SOFT_SIZE"),
         "update_time": _match_js_value(text, "HSJDAY_SOFT_TIME"),
+        **zip_headers,
     }
 
 
@@ -181,11 +201,18 @@ def _run_sync(force_download: bool) -> None:
         _status.remote_time = remote["update_time"]
         _status.remote_size = remote["size"]
         manifest = _read_manifest()
+        validator_changed = any(
+            remote.get(key)
+            and manifest.get(key)
+            and remote[key] != str(manifest.get(key, ""))
+            for key in ("zip_etag", "zip_last_modified", "zip_content_length")
+        )
         same_remote = bool(
             ZIP_PATH.exists()
             and zipfile.is_zipfile(ZIP_PATH)
             and remote["update_time"]
             and remote["update_time"] == str(manifest.get("remote_time", ""))
+            and not validator_changed
         )
 
         if force_download or not same_remote:
@@ -202,6 +229,9 @@ def _run_sync(force_download: bool) -> None:
                 "zip_url": TDX_ZIP_URL,
                 "remote_time": remote["update_time"],
                 "remote_size": remote["size"],
+                "zip_etag": remote.get("zip_etag", ""),
+                "zip_last_modified": remote.get("zip_last_modified", ""),
+                "zip_content_length": remote.get("zip_content_length", ""),
                 "zip_size_bytes": ZIP_PATH.stat().st_size if ZIP_PATH.exists() else 0,
                 "last_raw_date": _last_raw_date(),
                 "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -226,7 +256,12 @@ def _download_zip() -> None:
     _status.unit = "bytes"
     _status.done = 0
     _status.total = 0
-    headers = {"User-Agent": USER_AGENT, "Referer": "https://www.tdx.com.cn/article/vipdata.html"}
+    headers = {
+        "User-Agent": USER_AGENT,
+        "Referer": "https://www.tdx.com.cn/article/vipdata.html",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
+    }
     temp_path = ZIP_PATH.with_suffix(".zip.part")
     temp_path.unlink(missing_ok=True)
     try:
@@ -234,6 +269,7 @@ def _download_zip() -> None:
             "GET",
             TDX_ZIP_URL,
             headers=headers,
+            params={"_": str(time.time_ns())},
             timeout=httpx.Timeout(60, read=120),
             follow_redirects=True,
         ) as response:
