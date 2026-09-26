@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     raw_dir: Path | None = None         # 默认 data_dir / "raw"
     cache_dir: Path | None = None       # 默认 data_dir / "cache"
     db_dir: Path | None = None          # 默认 data_dir / "db"
+    # AI 复盘每次生成指令时直接读取此文件，不缓存正文或回退到项目副本。
+    ai_review_handbook_path: Path = Path(
+        "C:/Users/66470/Desktop/Memo/Memo/情绪周期/完整情绪周期操作手册.md"
+    )
 
     # === 服务配置 ===
     api_prefix: str = "/api"

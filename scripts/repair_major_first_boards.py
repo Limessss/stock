@@ -20,9 +20,12 @@ from backend.app.services import sentiment_service
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apply", action="store_true", help="备份后应用修复；默认仅预览")
+    parser.add_argument("--add-only", action="store_true", help="只补充符合规则的首板，保留已有人工标记")
     args = parser.parse_args()
     with SessionLocal() as session:
         changes = sentiment_service.plan_major_first_board_repair(session)
+        if args.add_only:
+            changes = [change for change in changes if change["after"]]
         report = {
             "add": sum(change["after"] for change in changes),
             "remove": sum(not change["after"] for change in changes),

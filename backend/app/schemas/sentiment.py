@@ -41,6 +41,7 @@ class SentimentStockItem(BaseModel):
 
 
 class SentimentNegativeFeedbackItem(BaseModel):
+    category: Literal["recent_strong", "former_leader"] = "recent_strong"
     code: str
     name: str = ""
     recent_max_board: int
@@ -94,6 +95,7 @@ class SentimentSyncStatus(BaseModel):
 
 class SentimentDay(BaseModel):
     trade_date: str
+    summary: str = ""
     market: SentimentMarket
     limit_up_themes: list[SentimentThemeItem] = Field(default_factory=list)
     new_high_themes: list[SentimentThemeItem] = Field(default_factory=list)
@@ -158,6 +160,10 @@ class SentimentLatestSyncResponse(BaseModel):
 
 class MajorFirstBoardsUpdate(BaseModel):
     codes: list[str] = Field(default_factory=list, max_length=100)
+
+
+class SentimentSummaryUpdate(BaseModel):
+    summary: str = Field(max_length=5000)
 
 
 class FeedbackCreate(BaseModel):

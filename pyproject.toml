@@ -28,6 +28,7 @@ dependencies = [
     "openai>=1.40",
     "pypinyin>=0.53",
     "pytdx>=1.72",
+    "mcp>=1.26,<2",
 ]
 
 [project.optional-dependencies]

@@ -1,7 +1,7 @@
 """HTTP/WebSocket 路由层。"""
 from fastapi import APIRouter
 
-from . import backtest, data, gann, health, kline, market, notes, scan, sentiment, settings, stocks, strategies
+from . import ai_reviews, backtest, data, gann, health, kline, market, notes, scan, sentiment, settings, stocks, strategies
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["health"])
@@ -14,6 +14,7 @@ api_router.include_router(stocks.router, tags=["stocks"])
 api_router.include_router(data.router, tags=["data"])
 api_router.include_router(backtest.router, tags=["backtest"])
 api_router.include_router(notes.router, tags=["notes"])
+api_router.include_router(ai_reviews.router, tags=["ai-reviews"])
 api_router.include_router(market.router, tags=["market"])
 api_router.include_router(sentiment.router, tags=["sentiment"])
 

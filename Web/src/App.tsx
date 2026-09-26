@@ -13,6 +13,8 @@ import { syncMarketToday } from "@/api/market";
 import { useThemeStore } from "@/store/theme";
 
 import BacktestPage from "@/pages/Backtest";
+import AiReviewsPage from "@/pages/AiReviews";
+import AiReviewDetailPage from "@/pages/AiReviewDetail";
 import DataManagePage from "@/pages/DataManage";
 import GannAnalysisPage from "@/pages/GannAnalysis";
 import HealthPage from "@/pages/Health";
@@ -37,6 +39,7 @@ const primaryNav: NavItem[] = [
   { path: "/backtest", label: "回测中心", caption: "验证与复盘", icon: ExperimentOutlined },
   { path: "/gann", label: "江恩角度线", caption: "趋势结构", icon: RiseOutlined },
   { path: "/notes", label: "复盘笔记", caption: "交易记录", icon: BookOutlined },
+  { path: "/ai-reviews", label: "AI复盘", caption: "Agent 研究归档", icon: RobotOutlined },
 ];
 
 const sentimentNav: NavItem[] = [
@@ -157,6 +160,8 @@ export default function App() {
             <Route path="/gann" element={<GannAnalysisPage />} />
             <Route path="/notes" element={<ReviewNotesPage />} />
             <Route path="/notes/:id" element={<ReviewNoteEditorPage />} />
+            <Route path="/ai-reviews" element={<AiReviewsPage />} />
+            <Route path="/ai-reviews/:id" element={<AiReviewDetailPage />} />
             <Route path="/sentiment" element={<Navigate to="/sentiment/ladder" replace />} />
             <Route path="/sentiment/ladder" element={<SentimentCyclePage />} />
             <Route path="/sentiment/interval-gains" element={<IntervalGainsPage />} />

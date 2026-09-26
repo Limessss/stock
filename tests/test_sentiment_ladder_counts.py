@@ -83,7 +83,29 @@ class LadderCountTests(unittest.TestCase):
         self.assertEqual(get_continuous_board_count(self.cache_dir, "SH603123", "2026-09-04"), 0)
         self.assertIsNone(get_continuous_board_count(self.cache_dir, "SH603123", "2026-09-07"))
 
-    def test_auto_origin_stays_in_current_run_and_ignores_cumulative_three(self) -> None:
+    def test_history_window_includes_day_30_but_not_day_31(self) -> None:
+        engine = create_engine("sqlite:///:memory:")
+        self.addCleanup(engine.dispose)
+        Base.metadata.create_all(engine)
+        confirmation = "2026-09-14"
+        boundary = (pd.Timestamp(confirmation) - pd.offsets.BDay(30)).strftime("%Y-%m-%d")
+        outside = (pd.Timestamp(confirmation) - pd.offsets.BDay(31)).strftime("%Y-%m-%d")
+        with Session(engine) as session:
+            for date, count in [(outside, 1), (boundary, 1), ("2026-09-09", 2), ("2026-09-10", 1), (confirmation, 3)]:
+                session.add(SentimentLadderItem(id=date, trade_date=date, code="SZ000823", name="超声电子", board_count=count))
+            session.flush()
+            with (
+                mock.patch.object(sentiment_service, "_continuous_board_count", side_effect=lambda item: item.board_count),
+                mock.patch.object(sentiment_service, "get_three_board_origin", return_value="2026-09-10"),
+            ):
+                self.assertEqual(sentiment_service._auto_mark_three_board_origins(session, confirmation), 2)
+                self.assertEqual(sentiment_service._auto_mark_three_board_origins(session, confirmation), 0)
+            for date in [boundary, "2026-09-10"]:
+                self.assertTrue(session.get(SentimentLadderItem, date).is_major_first_board)
+            for date in [outside, "2026-09-09", confirmation]:
+                self.assertFalse(session.get(SentimentLadderItem, date).is_major_first_board)
+
+    def test_auto_origin_includes_previous_first_boards_and_ignores_cumulative_three(self) -> None:
         self.dates = pd.bdate_range("2026-08-28", periods=7)
         self.closes = [10, 11, 10, 10, 11, 12.1, 13.31]
         self.write_prices()
@@ -103,26 +125,26 @@ class LadderCountTests(unittest.TestCase):
                 ))
             session.flush()
             self.assertEqual(sentiment_service._auto_mark_three_board_origins(session, "2026-09-04"), 0)
-            # 旧规则误标了上一轮首板，重算计划必须移除并补上当前首板。
+            # 窗口内上一轮首板应保留，同时补上当前首板。
             session.get(SentimentLadderItem, "2026-08-31").is_major_first_board = True
             session.flush()
             changes = sentiment_service.plan_major_first_board_repair(session)
             self.assertEqual(
                 {(item["trade_date"], item["before"], item["after"]) for item in changes},
-                {("2026-08-31", True, False), ("2026-09-03", False, True)},
+                {("2026-09-03", False, True)},
             )
             self.assertTrue(session.get(SentimentLadderItem, "2026-08-31").is_major_first_board)
             session.get(SentimentLadderItem, "2026-08-31").is_major_first_board = False
-            self.assertEqual(sentiment_service._auto_mark_three_board_origins(session, "2026-09-07"), 1)
+            self.assertEqual(sentiment_service._auto_mark_three_board_origins(session, "2026-09-07"), 2)
             self.assertTrue(session.get(SentimentLadderItem, "2026-09-03").is_major_first_board)
-            self.assertFalse(session.get(SentimentLadderItem, "2026-08-31").is_major_first_board)
+            self.assertTrue(session.get(SentimentLadderItem, "2026-08-31").is_major_first_board)
             self.assertEqual(sentiment_service._auto_mark_three_board_origins(session, "2026-09-07"), 0)
 
-            # 本轮首板快照缺失时不能把标记落到上一次首板。
+            # 本轮首板快照缺失时，窗口内已标记的历史首板仍保留。
             session.delete(session.get(SentimentLadderItem, "2026-09-03"))
             session.flush()
             self.assertEqual(sentiment_service._auto_mark_three_board_origins(session, "2026-09-07"), 0)
-            self.assertFalse(session.get(SentimentLadderItem, "2026-08-31").is_major_first_board)
+            self.assertTrue(session.get(SentimentLadderItem, "2026-08-31").is_major_first_board)
 
             # 缺少行情时也不靠累计板数猜测。
             self.path.unlink()

@@ -46,6 +46,7 @@ export interface SentimentLadderItem {
 }
 
 export interface SentimentNegativeFeedbackItem {
+  category: "recent_strong" | "former_leader";
   code: string;
   name: string;
   recent_max_board: number;
@@ -70,6 +71,7 @@ export interface SentimentFeedbackItem {
 
 export interface SentimentDay {
   trade_date: string;
+  summary: string;
   market: SentimentMarket;
   limit_up_themes: SentimentThemeItem[];
   new_high_themes: SentimentThemeItem[];
@@ -181,6 +183,10 @@ export async function syncSentimentLatest(
     { timeout: 300_000 }
   );
   return data;
+}
+
+export async function updateSentimentSummary(tradeDate: string, summary: string): Promise<void> {
+  await api.put(`/sentiment/${tradeDate}/summary`, { summary });
 }
 
 export async function updateMajorFirstBoards(

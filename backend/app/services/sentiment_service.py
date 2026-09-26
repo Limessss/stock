@@ -37,7 +37,9 @@ from . import kaipanla_client, market_store
 
 PARSER_VERSION = 4
 NEGATIVE_FEEDBACK_LOOKBACK = 10
+FORMER_LEADER_LOOKBACK = 60
 RECENT_SYNC_DAYS = 30
+MAJOR_FIRST_BOARD_LOOKBACK = 30
 EXTERNAL_ENDPOINTS_CURRENT = (
     "limit_ladder",
     "limit_reasons",
@@ -682,7 +684,8 @@ def _ensure_daily(session: Session, trade_date: str) -> SentimentDaily:
 
 
 def _three_board_origins(session: Session, trade_date: str) -> list[SentimentLadderItem]:
-    """按本地行情定位真实三连板的本轮首板，不使用区间累计板数。"""
+    """真实三连板确认走强，回填本轮及此前 30 个工作日内的首板。"""
+    cutoff = (pd.Timestamp(trade_date) - pd.offsets.BDay(MAJOR_FIRST_BOARD_LOOKBACK)).strftime("%Y-%m-%d")
     three_board_items = session.scalars(
         select(SentimentLadderItem).where(
             SentimentLadderItem.trade_date == trade_date,
@@ -706,11 +709,19 @@ def _three_board_origins(session: Session, trade_date: str) -> list[SentimentLad
         )
         if origin is not None:
             origins.append(origin)
+        earlier = session.scalars(
+            select(SentimentLadderItem).where(
+                SentimentLadderItem.code == item.code,
+                SentimentLadderItem.trade_date >= cutoff,
+                SentimentLadderItem.trade_date < origin_date,
+            )
+        ).all()
+        origins.extend(candidate for candidate in earlier if _continuous_board_count(candidate) == 1)
     return origins
 
 
 def _auto_mark_three_board_origins(session: Session, trade_date: str) -> int:
-    """将当日真实三连板的本轮首板标为“主要首板”。"""
+    """将真实三连板对应的本轮及窗口内历史首板标为“主要首板”。"""
     marked = 0
     for origin in _three_board_origins(session, trade_date):
         if origin.is_major_first_board:
@@ -1075,7 +1086,7 @@ def _negative_feedback_for_day(session: Session, daily: SentimentDaily) -> list[
     if not down_by_code:
         return []
     calendar_cutoff = (
-        pd.Timestamp(daily.trade_date) - pd.Timedelta(days=21)
+        pd.Timestamp(daily.trade_date) - pd.Timedelta(days=120)
     ).strftime("%Y-%m-%d")
     recent_dates = list(
         session.scalars(
@@ -1086,7 +1097,7 @@ def _negative_feedback_for_day(session: Session, daily: SentimentDaily) -> list[
                 SentimentDaily.trade_date >= calendar_cutoff,
             )
             .order_by(SentimentDaily.trade_date.desc())
-            .limit(NEGATIVE_FEEDBACK_LOOKBACK)
+            .limit(FORMER_LEADER_LOOKBACK)
         ).all()
     )
     if not recent_dates:
@@ -1098,23 +1109,36 @@ def _negative_feedback_for_day(session: Session, daily: SentimentDaily) -> list[
             SentimentLadderItem.board_count >= 3,
         )
     ).all()
-    best_by_code: dict[str, SentimentLadderItem] = {}
+    recent_cutoff = (pd.Timestamp(daily.trade_date) - pd.Timedelta(days=21)).strftime("%Y-%m-%d")
+    short_dates = set(date for date in recent_dates[:NEGATIVE_FEEDBACK_LOOKBACK] if date >= recent_cutoff)
+    # 两类独立匹配；同时满足时优先显示近期强势股，每只股票只展示一次。
+    recent_by_code: dict[str, tuple[int, str, SentimentLadderItem]] = {}
+    former_by_code: dict[str, tuple[int, str, SentimentLadderItem]] = {}
     for item in ladder_items:
-        previous = best_by_code.get(item.code)
-        if previous is None or (item.board_count, item.trade_date) > (
-            previous.board_count,
-            previous.trade_date,
-        ):
-            best_by_code[item.code] = item
+        height = _continuous_board_count(item)
+        if height is None:
+            continue
+        targets = []
+        if item.trade_date in short_dates and height >= 3:
+            targets.append(recent_by_code)
+        if height >= 5:
+            targets.append(former_by_code)
+        for candidates in targets:
+            previous = candidates.get(item.code)
+            if previous is None or (height, item.trade_date) > previous[:2]:
+                candidates[item.code] = (height, item.trade_date, item)
     result = []
-    for code, item in best_by_code.items():
+    for code in recent_by_code.keys() | former_by_code.keys():
+        is_recent = code in recent_by_code
+        height, board_date, item = (recent_by_code if is_recent else former_by_code)[code]
         stock = down_by_code[code]
         result.append(
             {
                 "code": code,
                 "name": str(item.name or stock.get("name") or ""),
-                "recent_max_board": item.board_count,
-                "recent_board_date": item.trade_date,
+                "recent_max_board": height,
+                "recent_board_date": board_date,
+                "category": "recent_strong" if is_recent else "former_leader",
                 "board_type": item.board_type,
                 "themes": item.themes or [],
                 "source": "derived",
@@ -1195,6 +1219,7 @@ def get_day(session: Session, trade_date: str) -> dict | None:
             "three_board_count": three_board_count,
             "items": ladder_items,
         },
+        "summary": daily.summary or "",
         "negative_feedback": _negative_feedback_for_day(session, daily),
         "sync_status": {
             "local_complete": daily.local_complete,
@@ -1226,6 +1251,15 @@ def get_matrix(
         day["new_high_stocks"] = []
         result.append(day)
     return result
+
+
+def set_summary(session: Session, trade_date: str, summary: str) -> bool:
+    daily = session.get(SentimentDaily, normalize_date(trade_date))
+    if daily is None:
+        return False
+    daily.summary = summary
+    session.commit()
+    return True
 
 
 def set_major_first_boards(session: Session, trade_date: str, codes: list[str]) -> dict:

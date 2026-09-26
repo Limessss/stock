@@ -22,6 +22,7 @@ from ..schemas.sentiment import (
     SentimentMatrixResponse,
     SentimentSyncRequest,
     SentimentSyncResponse,
+    SentimentSummaryUpdate,
 )
 from ..services import panorama_service, sentiment_service
 from ..services.interval_gain_service import get_interval_gains
@@ -229,6 +230,17 @@ def sync_sentiment_day(
         session.rollback()
         raise HTTPException(500, f"情绪数据同步失败: {exc}") from exc
     return SentimentSyncResponse.model_validate(result)
+
+
+@router.put("/sentiment/{trade_date}/summary", response_model=SentimentSummaryUpdate)
+def update_summary(
+    trade_date: str,
+    body: SentimentSummaryUpdate,
+    session: Session = Depends(get_session),
+) -> SentimentSummaryUpdate:
+    if not sentiment_service.set_summary(session, trade_date, body.summary):
+        raise HTTPException(404, "该交易日尚未同步")
+    return body
 
 
 @router.put("/sentiment/{trade_date}/major-first-boards", response_model=SentimentDay)

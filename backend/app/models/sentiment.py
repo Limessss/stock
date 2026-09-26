@@ -14,6 +14,7 @@ class SentimentDaily(Base):
     __tablename__ = "sentiment_daily"
 
     trade_date: Mapped[str] = mapped_column(String(10), primary_key=True)
+    summary: Mapped[str] = mapped_column(Text, default="", server_default="")
     sh_change_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
     up_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     down_count: Mapped[int | None] = mapped_column(Integer, nullable=True)

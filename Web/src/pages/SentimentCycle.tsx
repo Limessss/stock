@@ -1,4 +1,4 @@
-import { type UIEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type ChangeEvent, type ReactNode, type UIEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Alert,
@@ -9,6 +9,7 @@ import {
   Col,
   Descriptions,
   Empty,
+  Input,
   Modal,
   Popconfirm,
   Row,
@@ -32,6 +33,7 @@ import {
   fetchSentimentMatrix,
   syncSentimentLatest,
   updateMajorFirstBoards,
+  updateSentimentSummary,
   type SentimentDay,
   type SentimentLadderItem,
   type SentimentNegativeFeedbackItem,
@@ -203,12 +205,13 @@ function NegativeFeedbackCards({
       type="button"
       className="sentiment-negative-stock-card"
       onClick={() => onOpen({ code: stock.code, name: stock.name, signalDate: tradeDate })}
-      title={`近10个交易日最高${stock.recent_max_board}板，今日跌停`}
+      title={`${stock.category === "former_leader" ? "前期高标 · 近60个交易日" : "近期强势股 · 近10个交易日"}最高${stock.recent_max_board}连板，当日收盘跌停`}
     >
       <div className="sentiment-matrix-stock-title">
         <strong>{stock.name || stock.code}</strong>
-        <span className="sentiment-negative-board-tag">曾{stock.recent_max_board}板</span>
+        <span className="sentiment-negative-board-tag">曾{stock.recent_max_board}连板</span>
       </div>
+      <div>{stock.category === "former_leader" ? "前期高标" : "近期强势股"}</div>
       <code>{stock.code} · {dayjs(stock.recent_board_date).format("MM-DD")}高标</code>
     </button>
   );
@@ -244,6 +247,7 @@ function MatrixView({
   onLoadMore,
   onSelectDate,
   onOpenStock,
+  renderSummary,
 }: {
   items: SentimentDay[];
   loading: boolean;
@@ -252,6 +256,7 @@ function MatrixView({
   onLoadMore: () => Promise<unknown>;
   onSelectDate: (date: string) => void;
   onOpenStock: (target: StockKlineTarget) => void;
+  renderSummary: (day: SentimentDay) => ReactNode;
 }) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const initializedScrollRef = useRef(false);
@@ -478,8 +483,9 @@ function MatrixView({
           />
         ),
       },
+      { key: "summary", label: "总结", render: renderSummary },
     ],
-    [leaderPathKeys, onOpenStock]
+    [leaderPathKeys, onOpenStock, renderSummary]
   );
 
   const columns = useMemo(
@@ -596,6 +602,7 @@ export default function SentimentCyclePage() {
   const [view, setView] = useState<"matrix" | "day">("matrix");
   const [selectedDate, setSelectedDate] = useState(nowBeijing().format("YYYY-MM-DD"));
   const [majorCodes, setMajorCodes] = useState<string[]>([]);
+  const [summaryDrafts, setSummaryDrafts] = useState<Record<string, string>>({});
   const [klineTarget, setKlineTarget] = useState<StockKlineTarget | null>(null);
 
   const matrixQ = useInfiniteQuery({
@@ -670,6 +677,51 @@ export default function SentimentCyclePage() {
     onError: (error: Error) => message.error(error.message),
   });
 
+  const summaryMut = useMutation({
+    mutationFn: ({ date, summary }: { date: string; summary: string }) => updateSentimentSummary(date, summary),
+    onSuccess: async (_, { date, summary }) => {
+      await invalidate();
+      setSummaryDrafts((current) => {
+        if (current[date] !== summary) return current;
+        const next = { ...current };
+        delete next[date];
+        return next;
+      });
+      message.success("总结已保存");
+    },
+    onError: (error: Error) => message.error(`总结保存失败：${error.message}`),
+  });
+
+  const renderSummary = (day: SentimentDay) => {
+    const value = summaryDrafts[day.trade_date] ?? day.summary ?? "";
+    const dirty = value !== (day.summary ?? "");
+    return (
+      <Space direction="vertical" size={8} style={{ width: "100%" }}>
+        <Input.TextArea
+          aria-label={`${day.trade_date} 总结`}
+          placeholder="手工填写当日总结"
+          value={value}
+          rows={5}
+          maxLength={5000}
+          style={{ width: "100%", resize: "vertical" }}
+          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
+            const summary = event.target.value;
+            setSummaryDrafts((current) => ({ ...current, [day.trade_date]: summary }));
+          }}
+        />
+        <Button
+          size="small"
+          disabled={!dirty || summaryMut.isPending}
+          loading={summaryMut.isPending && summaryMut.variables?.date === day.trade_date}
+          onClick={() => summaryMut.mutate({ date: day.trade_date, summary: value })}
+        >
+          保存总结
+        </Button>
+        {dirty && <Text type="secondary">未保存</Text>}
+      </Space>
+    );
+  };
+
   const selectDay = (date: string) => {
     setSelectedDate(date);
     setView("day");
@@ -730,6 +782,7 @@ export default function SentimentCyclePage() {
             onLoadMore={loadMoreMatrix}
             onSelectDate={selectDay}
             onOpenStock={setKlineTarget}
+            renderSummary={renderSummary}
           />
         </Card>
       )}
@@ -811,7 +864,7 @@ export default function SentimentCyclePage() {
               </Card>
 
               <Card title="主要首板" extra={<Button loading={majorMut.isPending} onClick={() => majorMut.mutate()}>保存调整</Button>}>
-                <Paragraph type="secondary">三板股形成后，系统会自动回填到它最近一次首板日期；这里仍可手动补充或调整。</Paragraph>
+                <Paragraph type="secondary">连续三板形成后，系统会自动标记本轮首板，同时回填该股此前 30 个工作日内的其他首板（工作日按周一至周五计算）；这里仍可手动补充或调整。</Paragraph>
                 {firstBoards.length === 0 ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无首板数据" /> : (
                   <Checkbox.Group className="sentiment-first-board-picker" value={majorCodes} onChange={(values) => setMajorCodes(values as string[])} style={{ width: "100%" }}>
                     <Row gutter={[8, 8]}>{firstBoards.map((item) => <Col xs={24} md={12} lg={8} key={item.id}><Checkbox value={item.code}><Tooltip title={item.reason}>{item.name || item.code} {item.themes.length ? `（${item.themes.join("+")}）` : ""}</Tooltip></Checkbox></Col>)}</Row>
@@ -819,13 +872,14 @@ export default function SentimentCyclePage() {
                 )}
               </Card>
 
-              <Card title="负反馈 · 近10个交易日曾进入3板+后跌停">
+              <Card title="负反馈 · 近10日3连板 / 近60日5连板高标收盘跌停">
                 <NegativeFeedbackCards
                   stocks={day.negative_feedback}
                   tradeDate={selectedDate}
                   onOpen={setKlineTarget}
                 />
               </Card>
+              <Card title="总结">{renderSummary(day)}</Card>
             </Space>
           )}
         </>
